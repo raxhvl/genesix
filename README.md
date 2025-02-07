@@ -18,3 +18,8 @@ pnpm dev
 # or
 bun dev
 ```
+
+## Acknowledgments
+
+- The first prototype was built using [v0.dev](https://v0.dev/)
+- The landing page is a fork of [this page](https://v0.dev/chat/community/background-paths-s2R42ut7CxT) by knockout

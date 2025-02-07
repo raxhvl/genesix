@@ -152,7 +152,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
 
     {
       id: 5,
-      title: "Day 4: Join a DAO, learn about governance models, and more!",
+      title: "Day 5: Join a DAO, learn about governance models, and more!",
       tasks: [
         {
           id: 6,
@@ -166,7 +166,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
     },
     {
       id: 6,
-      title: "Day 4: Create an Onchain social account, post content, and more!",
+      title: "Day 6: Create an Onchain social account, post content, and more!",
       tasks: [
         {
           id: 6,
