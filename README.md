@@ -1,4 +1,4 @@
-# Genesix
+# Genesix 🌌
 
 The first six days of your web3 origin story.
 
@@ -6,7 +6,7 @@ The first six days of your web3 origin story.
 
 ### Front end
 
-The front end is built using [nextjs](h.ttps://nextjs.org/docs).
+The front end is built using [nextjs](https://nextjs.org/docs).
 To run a development server:
 
 ```bash
