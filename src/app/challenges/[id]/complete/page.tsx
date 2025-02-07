@@ -25,7 +25,7 @@ export default function ChallengeCompletePage({
     return <div>Challenge not found</div>;
   }
 
-  const shareableLink = `https://<link>/share/${challengeId}`;
+  const shareableLink = `https://<link>.com/share/${challengeId}`;
 
   return (
     <div className="container mx-auto px-4 py-8">

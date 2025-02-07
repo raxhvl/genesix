@@ -1,31 +1,32 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Send } from "lucide-react"
 
 type TaskFormProps = {
   task: {
-    id: number;
-    title: string;
-    proofType: "link" | "text" | "image";
-  };
-  onComplete: () => void;
-};
+    id: number
+    title: string
+    proofType: "link" | "text" | "image"
+  }
+  onComplete: (proof: string) => void
+}
 
 export default function TaskForm({ task, onComplete }: TaskFormProps) {
-  const [proof, setProof] = useState("");
+  const [proof, setProof] = useState("")
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (proof) {
-      onComplete();
+      onComplete(proof)
     }
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 w-full">
       {task.proofType === "link" && (
         <Input
           type="url"
@@ -33,6 +34,7 @@ export default function TaskForm({ task, onComplete }: TaskFormProps) {
           value={proof}
           onChange={(e) => setProof(e.target.value)}
           required
+          className="bg-background text-foreground"
         />
       )}
       {task.proofType === "text" && (
@@ -41,6 +43,7 @@ export default function TaskForm({ task, onComplete }: TaskFormProps) {
           value={proof}
           onChange={(e) => setProof(e.target.value)}
           required
+          className="bg-background text-foreground"
         />
       )}
       {task.proofType === "image" && (
@@ -49,9 +52,14 @@ export default function TaskForm({ task, onComplete }: TaskFormProps) {
           accept="image/*"
           onChange={(e) => setProof(e.target.files?.[0]?.name || "")}
           required
+          className="bg-background text-foreground"
         />
       )}
-      <Button type="submit">Submit Proof</Button>
+      <Button type="submit" variant="secondary" className="w-full">
+        <Send className="mr-2 h-4 w-4" />
+        Submit Proof
+      </Button>
     </form>
-  );
+  )
 }
+
