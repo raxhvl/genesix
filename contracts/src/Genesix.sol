@@ -13,13 +13,20 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 ******************************************/ 
 
 contract Genesix is ERC721, Ownable {
-
     /*###########################/*
     ||           State           ||
     /*###########################*/
     uint256 private _nextTokenId;
-    mapping(address => bool) public approvers;
-   
+    mapping(address approver => bool isApproved) public approvers;
+
+    struct Player {
+        string nickname;
+        mapping(uint256 challengeId => uint256[6] answers) answers;
+    }
+
+    mapping(address => Player) public players;
+    mapping(uint256 tokenId => uint256 challengeId) public tokenToChallengeId;
+
     /*############################/*
     ||           Events           ||
     /*############################*/
@@ -30,7 +37,7 @@ contract Genesix is ERC721, Ownable {
     ||            Errors          ||
     /*############################*/
     error Unauthorized();
-    
+
     /*############################/*
     ||         Modifiers          ||
     /*############################*/
@@ -38,19 +45,35 @@ contract Genesix is ERC721, Ownable {
         require(approvers[msg.sender], Unauthorized());
         _;
     }
-    constructor(address initialOwner)
-        ERC721("Onchain Days", "OCD")
-        Ownable(initialOwner)
-    {}
+
+    constructor(address initialOwner) ERC721("Onchain Days", "OCD") Ownable(initialOwner) {}
 
     /*############################/*
     ||                            ||
     ||         Public API         ||
     ||                            ||
     /*############################*/
-    function safeMint(address to) public onlyOwner {
+    function submit(uint256 challengeId, address playerAddress, string calldata nickname, uint256[6] calldata answers)
+        public
+        onlyApprover
+    {
+        Player storage player = players[playerAddress];
+
+        // Players may submit challenges in any order.
+        // This allows them to update their nickname, if not already set.
+        if (bytes(nickname).length > 0 && keccak256(bytes(player.nickname)) != keccak256(bytes(nickname))) {
+            player.nickname = nickname;
+        }
+
+        for (uint256 i = 0; i < answers.length; i++) {
+            player.answers[challengeId][i] = answers[i];
+        }
+
         uint256 tokenId = _nextTokenId++;
-        _safeMint(to, tokenId);
+
+        // Record an NFT against a challenge and mint it.
+        tokenToChallengeId[tokenId] = challengeId;
+        _safeMint(playerAddress, tokenId);
     }
 
     // Approver management

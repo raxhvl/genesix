@@ -9,7 +9,6 @@ contract GenesixTest is Test {
 
     address owner = makeAddr("Owner");
 
-
     function setUp() public {
         genesix = new Genesix(owner);
     }
