@@ -1,6 +1,10 @@
-# Genesix 🌌
-
-The first six days of your web3 origin story.
+<!-- markdownlint-disable MD033 MD041 -->
+<p align="center">
+  <h1 align="center">Genesix 🌌</h1>
+</p>
+<p align="center">
+    The first six days of your web3 origin story.
+</p>
 
 ## Getting Started
 
@@ -72,9 +76,9 @@ forge test
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Disclaimer
+## ⚠️ Disclaimer
 
-⚠️ This software is experimental and provided "as is" without warranty of any kind. The software may contain bugs, errors, or security vulnerabilities.
+This software is experimental and provided "as is" without warranty of any kind. The software may contain bugs, errors, or security vulnerabilities.
 
 - Not recommended for production use without thorough testing
 - No guarantee of functionality or security
