@@ -1,18 +1,18 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
 import {Script, console} from "forge-std/Script.sol";
-import {Counter} from "../src/Counter.sol";
+import {Genesix} from "../src/Genesix.sol";
 
-contract CounterScript is Script {
-    Counter public counter;
+contract Launch is Script {
+    Genesix public genesix;
 
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        counter = new Counter();
+        genesix = new Genesix();
 
         vm.stopBroadcast();
     }
