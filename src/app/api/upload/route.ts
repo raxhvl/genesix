@@ -1,32 +1,34 @@
 import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { getPath } from "@/lib/fs";
 
 const s3Client = new S3Client({
-  region: process.env.AWS_REGION!,
+  region: process.env.MINIO_REGION!,
+  endpoint: process.env.NEXT_PUBLIC_MINIO_ENDPOINT!,
+  forcePathStyle: true,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    accessKeyId: process.env.MINIO_ACCESS_KEY!,
+    secretAccessKey: process.env.MINIO_SECRET_KEY!,
   },
 });
 
-const ONE_DAY = 60 * 60 * 24;
-
-const AWS_S3_URL_EXPIRATION =
-  parseInt(process.env.S3_URL_EXPIRATION!) || ONE_DAY * 7;
-
 export async function POST(request: Request) {
-  const { filename, contentType, chainId } = await request.json();
+  const { chainId, filename, fileType, contentType } = await request.json();
+
+  console.log(fileType);
 
   const command = new PutObjectCommand({
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Key: `chain-${chainId}/test/${filename}`,
+    Bucket: process.env.MINIO_BUCKET_NAME!,
+    Key: `${getPath(chainId, filename, fileType)}`,
     ContentType: contentType,
   });
 
+  console.log(`Uploading to key: ${getPath(chainId, filename, fileType)}`);
+
   try {
     const signedUrl = await getSignedUrl(s3Client, command, {
-      expiresIn: AWS_S3_URL_EXPIRATION,
+      expiresIn: 60,
     });
     return NextResponse.json({ signedUrl });
   } catch (error) {
