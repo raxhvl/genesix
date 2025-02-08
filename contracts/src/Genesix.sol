@@ -78,12 +78,14 @@ contract Genesix is ERC721, Ownable {
 
     // Approver management
     function addApprover(address _approver) external onlyOwner {
+        // TODO: define a customer error?
         require(!approvers[_approver], "Already approver");
         approvers[_approver] = true;
         emit ApproverAdded(_approver);
     }
 
     function removeApprover(address _approver) external onlyOwner {
+        // TODO: define a customer error?
         require(approvers[_approver], "Not approver");
         approvers[_approver] = false;
         emit ApproverRemoved(_approver);
