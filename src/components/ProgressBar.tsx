@@ -16,7 +16,7 @@ export default function ProgressBar({
             completedTasks.includes(task.id)
           );
           const isCurrent = challenge.id === currentChallengeId;
-          const isAccessible = challenge.id <= currentChallengeId;
+          const isAccessible = challenge.id <= (currentChallengeId ?? 0);
 
           return (
             <Link

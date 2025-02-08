@@ -53,8 +53,9 @@ function FloatingPaths({ position }: { position: number }) {
   );
 }
 
-export default function Home({ title = "Genesix" }: { title?: string }) {
-  const words = title.split(" ");
+export default function Home() {
+  const title = "Genesix";
+  const words = "".split(" ");
 
   const { isNewUser, setIsNewUser } = useAppContext();
   const router = useRouter();
@@ -128,16 +129,3 @@ export default function Home({ title = "Genesix" }: { title?: string }) {
     </div>
   );
 }
-
-// export default function WelcomePage() {
-//   return (
-//     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-400 via-pink-500 to-red-500">
-//       <div className="text-center bg-white p-8 rounded-lg shadow-lg">
-//         <h1 className="text-4xl font-bold mb-4">Welcome!</h1>
-//         <p className="text-lg mb-4">
-//           The first six chapters of your web3 origin story are about to begin.
-//         </p>
-//       </div>
-//     </div>
-//   );
-// }

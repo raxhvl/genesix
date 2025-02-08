@@ -11,14 +11,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { use } from "react";
 
 export default function ChallengeCompletePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const { challenges, currentDay } = useAppContext();
-  const challengeId = Number.parseInt(params.id);
+  const { id } = use(params);
+  const challengeId = Number.parseInt(id);
   const challenge = challenges.find((c) => c.id === challengeId);
 
   if (!challenge) {
