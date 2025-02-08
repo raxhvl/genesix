@@ -1,112 +1,140 @@
 "use client";
 
+import { useState } from "react";
 import { useAppContext } from "../context/AppContext";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+import TaskForm from "../../components/TaskForm";
+import ProgressBar from "../../components/ProgressBar";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
+  CardDescription,
 } from "@/components/ui/card";
-import ProgressBar from "../../components/ProgressBar";
-import { Trophy, CheckCircle, XCircle } from "lucide-react";
+import { Trophy, Send } from "lucide-react";
+import ConfirmationPopup from "@/components/ConfirmationPopup";
 
-export default function ChallengesPage() {
-  const { challenges, currentDay, completedTasks, skippedTasks, points } =
-    useAppContext();
+export default function ChallengePage({ params }: { params: { id: string } }) {
+  const {
+    challenges,
+    completedTasks,
+    skippedTasks,
+    completeTask,
+    skipTask,
+    currentDay,
+    setCurrentDay,
+  } = useAppContext();
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [completedTaskId, setCompletedTaskId] = useState<number | null>(null);
+  const router = useRouter();
+  const [taskProofs, setTaskProofs] = useState<Record<number, string>>({});
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
+  const handleProofChange = (taskId: number, proof: string) => {
+    setTaskProofs((prevProofs) => ({ ...prevProofs, [taskId]: proof }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmation = async () => {
+    for (const task of challenge.tasks) {
+      if (taskProofs[task.id]) {
+        await handleTaskCompletion(task.id, taskProofs[task.id]);
+      }
+    }
+    setShowConfirmation(false);
+  };
+
+  const challengeId = Number.parseInt(params.id);
+  const challenge = challenges.find((c) => c.id === challengeId);
+
+  if (!challenge) {
+    return <div>Challenge not found</div>;
+  }
+
+  const isAllTasksHandled = challenge.tasks.every(
+    (task) => completedTasks.includes(task.id) || skippedTasks.includes(task.id)
+  );
+  const isPreviousChallengeAvailable = challengeId > 1;
+  const isNextChallengeAvailable = challengeId < challenges.length;
+
+  const handleTaskCompletion = async (taskId: number, proof: string) => {
+    const success = await completeTask(taskId, proof);
+    if (success) {
+      setCompletedTaskId(taskId);
+      setShowCelebration(true);
+    }
+  };
+
+  const handleTaskSkip = (taskId: number) => {
+    skipTask(taskId);
+  };
+
+  const handleCelebrationClose = () => {
+    setShowCelebration(false);
+    setCompletedTaskId(null);
+
+    if (
+      challenge.tasks.every(
+        (task) =>
+          completedTasks.includes(task.id) || skippedTasks.includes(task.id)
+      )
+    ) {
+      if (challengeId === currentDay && challengeId < challenges.length) {
+        setCurrentDay(currentDay + 1);
+      }
+      if (challengeId === challenges.length) {
+        router.push("/challenges/complete");
+      } else {
+        router.push(`/challenges/${challengeId}/complete`);
+      }
+    }
+  };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6 glow">Genesix 🌌</h1>
-      <ProgressBar currentChallengeId={currentDay} />
-      <div className="mb-6 p-4 bg-accent rounded-lg">
-        <p className="text-xl">Current Day: {currentDay}</p>
-        <p className="text-xl">Total Points: {points}</p>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {challenges.map((challenge) => {
-          const completedTasksCount = challenge.tasks.filter((task) =>
-            completedTasks.includes(task.id)
-          ).length;
-          const isCompleted = completedTasksCount === challenge.tasks.length;
-          const isLocked = challenge.id > currentDay;
-          const totalPoints = challenge.tasks.reduce(
-            (sum, task) => sum + task.points,
-            0
-          );
-
-          return (
-            <Card
-              key={challenge.id}
-              className={`${
-                isLocked ? "opacity-50" : ""
-              } bg-accent text-accent-foreground glow-border`}
-            >
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Trophy className="mr-2 h-5 w-5 text-yellow-400" />
-                  {challenge.title}
-                </CardTitle>
-                <CardDescription>
-                  Progress: {completedTasksCount} / {challenge.tasks.length}{" "}
-                  tasks
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="mb-2">
-                  {isCompleted
-                    ? "Challenge completed!"
-                    : isLocked
-                    ? "Locked"
-                    : "In progress"}
-                </p>
-                <p>Total points: {totalPoints}</p>
-                <div className="mt-4">
-                  <h4 className="font-semibold mb-2">Tasks:</h4>
-                  <ul className="space-y-1">
-                    {challenge.tasks.map((task) => {
-                      const isCompleted = completedTasks.includes(task.id);
-                      const isSkipped = skippedTasks.includes(task.id);
-                      return (
-                        <li key={task.id} className="flex items-center">
-                          {isCompleted ? (
-                            <CheckCircle className="mr-2 h-4 w-4 text-green-500" />
-                          ) : isSkipped ? (
-                            <XCircle className="mr-2 h-4 w-4 text-yellow-500" />
-                          ) : (
-                            <div className="w-4 h-4 mr-2" />
-                          )}
-                          <span
-                            className={
-                              isCompleted
-                                ? "line-through text-green-500"
-                                : isSkipped
-                                ? "line-through text-yellow-500"
-                                : ""
-                            }
-                          >
-                            {task.title}
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Link href={`/challenges/${challenge.id}`} passHref>
-                  <Button disabled={isLocked} variant="secondary">
-                    {isCompleted ? "Review" : "Start Challenge"}
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          );
-        })}
-      </div>
+    <div className="container mx-auto px-4 py-8 relative">
+      <ProgressBar currentChallengeId={challengeId} />
+      <h1 className="text-3xl font-bold mb-6 glow flex items-center">
+        <Trophy className="mr-2 h-8 w-8 text-yellow-400" />
+        {challenge.title}
+      </h1>
+      <form onSubmit={handleSubmit} className="space-y-6 mb-16">
+        {challenge.tasks.map((task) => (
+          <Card
+            key={task.id}
+            className="bg-accent text-accent-foreground glow-border"
+          >
+            <CardHeader>
+              <CardTitle>{task.title}</CardTitle>
+              <CardDescription>{task.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>Points: {task.points}</p>
+              <TaskForm
+                task={task}
+                proof={taskProofs[task.id] || ""}
+                onProofChange={(proof) => handleProofChange(task.id, proof)}
+              />
+            </CardContent>
+          </Card>
+        ))}
+        <Button type="submit" variant="secondary" className="w-full">
+          <Send className="mr-2 h-4 w-4" />
+          Submit All Tasks
+        </Button>
+      </form>
+      {showConfirmation && (
+        <ConfirmationPopup
+          taskProofs={taskProofs}
+          onConfirm={handleConfirmation}
+          onCancel={() => setShowConfirmation(false)}
+        />
+      )}
     </div>
   );
 }
