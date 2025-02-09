@@ -11,6 +11,7 @@ import { useWeb3Context } from "@/lib/context/Web3Context";
 import { fetchSubmission } from "@/lib/fs";
 import { useWriteContract } from "wagmi";
 import { abi, getContractAddress } from "@/lib/config";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Page() {
   const { challenges } = useAppContext();
@@ -19,7 +20,7 @@ export default function Page() {
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(false);
   const [approvedTaskIds, setApprovedTaskIds] = useState<number[]>([]);
-  const [currentApproval, setCurrentApproval] = useState<Approval | null>(null);
+  const { toast } = useToast();
 
   const { writeContract, isSuccess, isPending, isError, error } =
     useWriteContract();
@@ -44,7 +45,11 @@ export default function Page() {
       setApprovedTaskIds([]); // Reset approvals for new submission
     } catch (error) {
       console.error("Error fetching submission:", error);
-      // TODO: Show error message
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to fetch submission data. Please try again.",
+      });
     } finally {
       setLoading(false);
     }
@@ -59,33 +64,40 @@ export default function Page() {
   function submitApproval() {
     if (!submission || !challenge) return;
 
-    const approval: Approval = {
-      nickname: submission.nickname,
-      playerAddress: submission.playerAddress,
-      challengeId: submission.challengeId,
-      points: challenge.tasks.map((task) =>
-        approvedTaskIds.includes(task.id) ? BigInt(task.points) : BigInt(0)
-      ),
-    };
-
     writeContract({
       address: getContractAddress(chainId),
       abi,
       functionName: "approveSubmission",
       args: [
-        approval.challengeId,
-        approval.playerAddress,
-        approval.nickname,
-        approval.points,
+        submission.challengeId,
+        submission.playerAddress,
+        submission.nickname,
+        challenge.tasks.map((task) =>
+          approvedTaskIds.includes(task.id) ? BigInt(task.points) : BigInt(0)
+        ),
       ],
     });
-    setCurrentApproval(approval);
   }
 
-  // Reset approval state when submission changes
+  // Watch for transaction status
   useEffect(() => {
-    setCurrentApproval(null);
-  }, [submission]);
+    if (isSuccess) {
+      toast({
+        title: "Success!",
+        description: "Submission has been approved successfully.",
+      });
+      // Clear submission data after successful approval
+      setSubmission(null);
+      setSubmissionId("");
+      setApprovedTaskIds([]);
+    } else if (isError && error) {
+      toast({
+        variant: "destructive",
+        title: "Transaction failed",
+        description: error.message,
+      });
+    }
+  }, [isSuccess, isError, error, toast]);
 
   return (
     <div className="container mx-auto p-4 space-y-4">
@@ -147,14 +159,6 @@ export default function Page() {
             >
               {isPending ? "Approving..." : "Approve"}
             </Button>
-            {isError && (
-              <p className="text-sm text-red-500">Error: {error.message}</p>
-            )}
-            {isSuccess && (
-              <p className="text-sm text-green-500">
-                Successfully approved submission!
-              </p>
-            )}
           </CardContent>
         </Card>
       )}

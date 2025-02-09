@@ -4,6 +4,7 @@ import "./globals.css";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/Header";
 import WalletProvider from "@/components/WalletProvider";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata = {
   title: "Genesix",
@@ -34,6 +35,7 @@ export default function RootLayout({
           <Header />
           <main>{children}</main>
         </WalletProvider>
+        <Toaster />
       </body>
     </html>
   );
