@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 
-export async function GET(
-  request: Request,
-  { params }: { params: { chainId: string; id: string } }
-) {
+type Props = {
+  params: Promise<{
+    chainId: string;
+    id: string;
+  }>;
+};
+
+export async function GET(request: Request, props: Props) {
+  const params = await props.params;
   try {
     const endpoint = process.env.NEXT_PUBLIC_MINIO_ENDPOINT;
     const bucket = process.env.MINIO_BUCKET_NAME;
