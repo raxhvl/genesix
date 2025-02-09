@@ -8,6 +8,7 @@ import {
 import { FormEvent, use, useState } from "react";
 import type { Submission } from "@/lib/context/AppContext";
 import { useAccount } from "wagmi";
+import { Button } from "@/components/ui/button";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { challenges } = useAppContext();
@@ -60,7 +61,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="grid w-full gap-2">
       {challenge.tasks.map((task) => (
         <div key={task.id}>
           <div>
@@ -75,7 +76,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           </div>
         </div>
       ))}
-      <button type="submit">Submit</button>
+      <Button type="submit">Submit</Button>
     </form>
   );
 }
