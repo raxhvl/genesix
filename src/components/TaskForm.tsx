@@ -26,28 +26,28 @@ async function handleImageUpload(
   const contentType = file.type;
 
   try {
-    const response = await fetch("/api/upload", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        chainId,
-        filename,
-        fileType: FileType.PROOF_IMAGE,
-        contentType,
-      }),
-    });
+    // const response = await fetch("/api/upload", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({
+    //     chainId,
+    //     filename,
+    //     fileType: FileType.PROOF_IMAGE,
+    //     contentType,
+    //   }),
+    // });
 
-    if (!response.ok) throw new Error("Failed to get signed URL");
+    // if (!response.ok) throw new Error("Failed to get signed URL");
 
-    const { signedUrl } = await response.json();
+    // const { signedUrl } = await response.json();
 
-    await fetch(signedUrl, {
-      method: "PUT",
-      body: file,
-      headers: { "Content-Type": contentType },
-    });
+    // await fetch(signedUrl, {
+    //   method: "PUT",
+    //   body: file,
+    //   headers: { "Content-Type": contentType },
+    // });
 
-    onProofChange(getFileUploadUrl(chainId, filename, FileType.PROOF_IMAGE));
+    onProofChange("https://via.placeholder.com/150");
   } catch (error) {
     console.error("Error uploading image:", error);
     // Handle error (e.g., show an error message to the user)
