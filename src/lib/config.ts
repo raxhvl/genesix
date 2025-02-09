@@ -1,6 +1,16 @@
-import { Metadata } from "next";
+"use client";
+import { getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { mainnet, sepolia, anvil } from "wagmi/chains";
 
-export const siteMetadata: Metadata = {
-  title: "Genesix",
-  description: "The first six days of your web3 origin story.",
-};
+const APP_NAME = "Genesix";
+
+export const chainConfig = getDefaultConfig({
+  appName: APP_NAME,
+  projectId: "NOT_SET",
+  // @ts-ignore
+  chains:
+    process.env.NODE_ENV === "development"
+      ? [mainnet, sepolia, anvil] // anvil only for local development
+      : [mainnet, sepolia],
+  ssr: true, // If your dApp uses server side rendering (SSR)
+});

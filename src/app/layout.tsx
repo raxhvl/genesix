@@ -1,9 +1,14 @@
-import { Geist, Geist_Mono } from "next/font/google";
+// Css
 import "./globals.css";
-import Header from "@/components/Header";
-import { siteMetadata } from "@/lib/config";
 
-export const metadata = siteMetadata;
+import { Geist, Geist_Mono } from "next/font/google";
+import Header from "@/components/Header";
+import WalletProvider from "@/components/WalletProvider";
+
+export const metadata = {
+  title: "Genesix",
+  description: "The first six days of your web3 origin story.",
+};
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,8 +30,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-svh bg-background`}
       >
-        <Header />
-        <main>{children}</main>
+        <WalletProvider>
+          <Header />
+          <main>{children}</main>
+        </WalletProvider>
       </body>
     </html>
   );
