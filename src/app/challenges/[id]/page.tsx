@@ -18,7 +18,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { FileType, generateFilename } from "@/lib/fs";
+import { FileType } from "@/lib/fs";
 import ReactConfetti from "react-confetti";
 import { useRouter } from "next/navigation";
 
@@ -92,12 +92,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       body: JSON.stringify({
         chainId: submission.chainId,
         fileType: FileType.CHALLENGE_SUBMISSION,
-        filename: generateFilename(
-          FileType.CHALLENGE_SUBMISSION,
-          submission.playerAddress,
-          submission.challengeId,
-          submission.chainId
-        ),
+        filename: "submission.json",
         contentType: "application/json",
       }),
     });
@@ -110,9 +105,26 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     return signedUrl;
   }
 
-  async function uploadSubmission(submission: Submission) {
+  function extractSubmissionId(url: string): string {
+    try {
+      // Parse the URL to get the path
+      const urlObj = new URL(url);
+      // Get the last part of the path (filename with extension)
+      const filename = urlObj.pathname.split("/").pop() || "";
+      // Remove the extension
+      return filename.replace(".json", "");
+    } catch (error) {
+      console.error("Failed to extract submission ID:", error);
+      return "";
+    }
+  }
+
+  async function uploadSubmission(submission: Submission): Promise<string> {
     // First get the signed URL
     const signedUrl = await getSignedUrl(submission);
+
+    // Extract submission ID from the signed URL
+    const submissionId = extractSubmissionId(signedUrl);
 
     // Then upload the actual submission using the signed URL
     const uploadResponse = await fetch(signedUrl, {
@@ -123,27 +135,19 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       },
     });
 
-    console.log(uploadResponse);
-
     if (!uploadResponse.ok) {
       throw new Error("Failed to upload submission");
     }
 
-    return uploadResponse;
+    return submissionId;
   }
 
   async function handleConfirmSubmission() {
     try {
       setIsUploading(true);
-      const submissionFilename = generateFilename(
-        FileType.CHALLENGE_SUBMISSION,
-        submission.playerAddress,
-        submission.challengeId,
-        submission.chainId
-      );
-      await uploadSubmission(submission);
+      const submissionId = await uploadSubmission(submission);
       setShowConfirmDialog(false);
-      setSubmissionId(submissionFilename);
+      setSubmissionId(submissionId);
       setShowSuccessDialog(true);
       setShowConfetti(true);
     } catch (error) {
@@ -257,8 +261,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               variant="outline"
               onClick={copySubmissionId}
             >
-              Copy Submission ID
-            </Button>
+              Copy Submission ID{" "}
+            </Button>{" "}
           </div>
           <DialogFooter>
             <Button onClick={handleSuccessClose}>Back to Challenges</Button>

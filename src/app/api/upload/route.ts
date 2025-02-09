@@ -18,13 +18,13 @@ export async function POST(request: Request) {
 
   console.log({ chainId, filename, fileType, contentType });
 
+  const Key = getPath(chainId, filename, fileType);
+
   const command = new PutObjectCommand({
     Bucket: process.env.MINIO_BUCKET_NAME!,
-    Key: `${getPath(chainId, filename, fileType)}`,
+    Key,
     ContentType: contentType,
   });
-
-  console.log(`Uploading to key: ${getPath(chainId, filename, fileType)}`);
 
   try {
     const signedUrl = await getSignedUrl(s3Client, command, {
