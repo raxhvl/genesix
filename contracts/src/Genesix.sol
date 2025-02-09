@@ -12,6 +12,9 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 *                                        *
 ******************************************/ 
 
+/// @title Genesix - An NFT-based challenge completion tracking system
+/// @notice This contract manages challenge submissions and approvals for players
+/// @dev Extends ERC721 for NFT functionality and Ownable for access control
 contract Genesix is ERC721, Ownable {
     /*###########################/*
     ||           State           ||
@@ -36,6 +39,8 @@ contract Genesix is ERC721, Ownable {
     /*############################/*
     ||            Errors          ||
     /*############################*/
+    /// @notice Thrown when a caller doesn't have required permissions
+    /// @dev User is not authorized to perform the requested action
     error Unauthorized();
 
     /*############################/*
@@ -53,8 +58,23 @@ contract Genesix is ERC721, Ownable {
     ||         Public API         ||
     ||                            ||
     /*############################*/
+    
+    /// @notice Get the points earned by a player for a specific challenge
+    /// @param playerAddress The address of the player
+    /// @param challengeId The ID of the challenge
+    /// @return An array of points earned for the challenge
+    function getChallengePoints(address playerAddress, uint256 challengeId) public view returns (uint256[] memory) {
+        return players[playerAddress].points[challengeId];
+    }
+
     //TODO:  rename answers to points
     //TODO: add challenge to players array.
+    /// @notice Approve a player's challenge submission and mint an NFT
+    /// @param challengeId The ID of the challenge being submitted
+    /// @param playerAddress The address of the player submitting the challenge
+    /// @param nickname The nickname of the player (optional if already set)
+    /// @param points Array of points earned for the challenge
+    /// @dev Only callable by approved approvers
     function approveSubmission(uint256 challengeId, address playerAddress, string calldata nickname, uint256[] calldata points)
         public
         onlyApprover
@@ -79,6 +99,9 @@ contract Genesix is ERC721, Ownable {
     }
 
     // Approver management
+    /// @notice Add a new approver address
+    /// @param _approver The address to be granted approver rights
+    /// @dev Only callable by contract owner
     function addApprover(address _approver) external onlyOwner {
         // TODO: define a customer error?
         require(!approvers[_approver], "Already approver");
@@ -86,6 +109,9 @@ contract Genesix is ERC721, Ownable {
         emit ApproverAdded(_approver);
     }
 
+    /// @notice Remove an existing approver
+    /// @param _approver The address to remove approver rights from
+    /// @dev Only callable by contract owner
     function removeApprover(address _approver) external onlyOwner {
         // TODO: define a customer error?
         require(approvers[_approver], "Not approver");
@@ -96,6 +122,8 @@ contract Genesix is ERC721, Ownable {
     /*############################/*
     ||          Private           ||
     /*############################*/
+    /// @notice Returns the base URI for computing token URIs
+    /// @return The base URI string
     function _baseURI() internal pure override returns (string memory) {
         return "http://TODO.com/token";
     }

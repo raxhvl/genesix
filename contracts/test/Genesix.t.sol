@@ -69,6 +69,34 @@ contract GenesixTest is Test {
         assertEq(genesix.tokenToChallengeId(0), challengeId);
     }
 
+    /// @notice Test getting challenge points
+    /// @dev Tests retrieving points for a specific challenge after submission
+    function test_GetChallengePoints() public {
+        // Setup
+        vm.startPrank(owner);
+        genesix.addApprover(approver);
+        vm.stopPrank();
+
+        // Prepare test data
+        uint256 challengeId = 1;
+        string memory nickname = "player1";
+        uint256[] memory points = new uint256[](3);
+        points[0] = 10;
+        points[1] = 20;
+        points[2] = 30;
+
+        // Submit as approver
+        vm.prank(approver);
+        genesix.approveSubmission(challengeId, player, nickname, points);
+
+        // Get and verify points
+        uint256[] memory retrievedPoints = genesix.getChallengePoints(player, challengeId);
+        assertEq(retrievedPoints.length, points.length);
+        for(uint256 i = 0; i < points.length; i++) {
+            assertEq(retrievedPoints[i], points[i]);
+        }
+    }
+
     /// @notice Test unauthorized submission approval
     /// @dev Tests that non-approvers cannot approve submissions
     function test_RevertWhen_UnauthorizedApproval() public {
