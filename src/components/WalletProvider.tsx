@@ -16,7 +16,7 @@ export default function WalletProvider({
   return (
     <WagmiProvider config={chainConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
+        <RainbowKitProvider coolMode>
           <main>{children}</main>
         </RainbowKitProvider>
       </QueryClientProvider>

@@ -1,6 +1,7 @@
 "use client";
 
 import { isRootPage } from "@/lib/ui";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { BoxSelect, ClipboardCheck, Settings } from "lucide-react";
 import Link from "next/link";
 
@@ -17,10 +18,11 @@ export default function Header() {
           <ClipboardCheck size={20} className="text-yellow-400" />
           Review
         </Link>
-        <Link href="/admin" className="flex items-center gap-1">
+        <Link href="/settings" className="flex items-center gap-1">
           <Settings size={20} className="text-yellow-400" />
-          Admin
+          Settings
         </Link>
+        <ConnectButton />
       </nav>
     </header>
   );

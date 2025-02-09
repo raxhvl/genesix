@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import challenges from "@/lib/data/challenges.json";
+import { Address } from "viem";
 
 // Exposing challenges via context has few benefits:
 // 1. It allows us to access challenges from any component without prop drilling
@@ -42,6 +43,27 @@ interface AppContextType {
 const defaultContext: AppContextType = {
   challenges: challenges as Challenge[],
 };
+
+export interface Submission {
+  nickname: string;
+  playerAddress: Address;
+  challengeId: number;
+  responses: Response[];
+  points: number[];
+}
+
+export interface Response {
+  taskId: number;
+  type: ProofType;
+  answer?: string;
+}
+
+export interface Approval {
+  nickname: string;
+  playerAddress: Address;
+  challengeId: number;
+  points: number[];
+}
 
 export const AppContext = createContext<AppContextType>(defaultContext);
 

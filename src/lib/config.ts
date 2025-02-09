@@ -6,7 +6,7 @@ const APP_NAME = "Genesix";
 
 export const chainConfig = getDefaultConfig({
   appName: APP_NAME,
-  projectId: "NOT_SET",
+  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!,
   // @ts-ignore
   chains:
     process.env.NODE_ENV === "development"
