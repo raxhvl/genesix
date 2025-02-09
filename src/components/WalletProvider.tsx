@@ -5,6 +5,7 @@ import { WagmiProvider } from "wagmi";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { chainConfig } from "@/lib/config";
+import { Web3Provider } from "@/lib/context/Web3Context";
 
 export default function WalletProvider({
   children,
@@ -16,8 +17,10 @@ export default function WalletProvider({
   return (
     <WagmiProvider config={chainConfig}>
       <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider coolMode>
-          <main>{children}</main>
+        <RainbowKitProvider>
+          <Web3Provider>
+            <main>{children}</main>
+          </Web3Provider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

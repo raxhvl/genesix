@@ -7,7 +7,6 @@ import {
 } from "@/lib/context/AppContext";
 import { FormEvent, use, useState } from "react";
 import type { Submission } from "@/lib/context/AppContext";
-import { useAccount } from "wagmi";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,10 +20,11 @@ import { Input } from "@/components/ui/input";
 import { FileType } from "@/lib/fs";
 import ReactConfetti from "react-confetti";
 import { useRouter } from "next/navigation";
+import { useWeb3Context } from "@/lib/context/Web3Context";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { challenges } = useAppContext();
-  const { address, chainId } = useAccount();
+  const { playerAddress, chainId } = useWeb3Context();
   const router = useRouter();
 
   const { id } = use(params);
@@ -35,15 +35,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const challenge = challenges.find((c) => c.id === challengeId);
 
-  // TODO: Use a better loading state
-  if (!address || !chainId) return <div>Connect your wallet</div>;
-
   // Initialize submission state
   const [submission, setSubmission] = useState<Submission>({
     version: SubmissionPayloadVersion.V1,
     chainId,
     nickname: "", // TODO: Get from wallet
-    playerAddress: address,
+    playerAddress,
     challengeId,
     responses:
       challenge?.tasks.map((task) => ({
