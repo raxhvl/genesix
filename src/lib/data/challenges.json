@@ -58,5 +58,10 @@
         "playersRequired": 1
       }
     ]
+  },
+  {
+    "id": 2,
+    "title": "Day 2: Using Ethereum Mainnet",
+    "tasks": []
   }
 ]
