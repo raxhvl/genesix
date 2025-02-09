@@ -6,9 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useAppContext } from "@/lib/context/AppContext";
 import type { Submission, Approval } from "@/lib/context/AppContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useWeb3Context } from "@/lib/context/Web3Context";
 import { fetchSubmission } from "@/lib/fs";
+import { useWriteContract } from "wagmi";
+import { abi, getContractAddress } from "@/lib/config";
 
 export default function Page() {
   const { challenges } = useAppContext();
@@ -17,6 +19,10 @@ export default function Page() {
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [loading, setLoading] = useState(false);
   const [approvedTaskIds, setApprovedTaskIds] = useState<number[]>([]);
+  const [currentApproval, setCurrentApproval] = useState<Approval | null>(null);
+
+  const { writeContract, isSuccess, isPending, isError, error } =
+    useWriteContract();
 
   // Find challenge and calculate points
   const challenge = submission
@@ -58,12 +64,28 @@ export default function Page() {
       playerAddress: submission.playerAddress,
       challengeId: submission.challengeId,
       points: challenge.tasks.map((task) =>
-        approvedTaskIds.includes(task.id) ? task.points : 0
+        approvedTaskIds.includes(task.id) ? BigInt(task.points) : BigInt(0)
       ),
     };
 
-    console.log("Approval Payload:", approval);
+    writeContract({
+      address: getContractAddress(chainId),
+      abi,
+      functionName: "approveSubmission",
+      args: [
+        approval.challengeId,
+        approval.playerAddress,
+        approval.nickname,
+        approval.points,
+      ],
+    });
+    setCurrentApproval(approval);
   }
+
+  // Reset approval state when submission changes
+  useEffect(() => {
+    setCurrentApproval(null);
+  }, [submission]);
 
   return (
     <div className="container mx-auto p-4 space-y-4">
@@ -110,6 +132,7 @@ export default function Page() {
                     <label htmlFor={`task-${task.id}`} className="font-medium">
                       {task.title} ({task.points} points)
                     </label>
+                    review{" "}
                     <p className="text-sm text-muted-foreground mt-1">
                       {response.answer || "No answer provided"}
                     </p>
@@ -117,9 +140,21 @@ export default function Page() {
                 </div>
               );
             })}
-            <Button onClick={submitApproval} className="w-full">
-              Approve
+            <Button
+              onClick={submitApproval}
+              className="w-full"
+              disabled={isPending || !approvedTaskIds.length}
+            >
+              {isPending ? "Approving..." : "Approve"}
             </Button>
+            {isError && (
+              <p className="text-sm text-red-500">Error: {error.message}</p>
+            )}
+            {isSuccess && (
+              <p className="text-sm text-green-500">
+                Successfully approved submission!
+              </p>
+            )}
           </CardContent>
         </Card>
       )}

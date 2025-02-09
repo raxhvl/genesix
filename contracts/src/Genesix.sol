@@ -21,7 +21,7 @@ contract Genesix is ERC721, Ownable {
 
     struct Player {
         string nickname;
-        mapping(uint256 challengeId => uint256[6] answers) answers;
+        mapping(uint256 challengeId => uint256[] points) points;
     }
 
     mapping(address => Player) public players;
@@ -55,7 +55,7 @@ contract Genesix is ERC721, Ownable {
     /*############################*/
     //TODO:  rename answers to points
     //TODO: add challenge to players array.
-    function approve(uint256 challengeId, address playerAddress, string calldata nickname, uint256[6] calldata point)
+    function approveSubmission(uint256 challengeId, address playerAddress, string calldata nickname, uint256[] calldata points)
         public
         onlyApprover
     {
@@ -67,8 +67,8 @@ contract Genesix is ERC721, Ownable {
             player.nickname = nickname;
         }
 
-        for (uint256 i = 0; i < answers.length; i++) {
-            player.answers[challengeId][i] = answers[i];
+        for (uint256 i = 0; i < points.length; i++) {
+            player.points[challengeId].push(points[i]);
         }
 
         uint256 tokenId = _nextTokenId++;

@@ -42,4 +42,40 @@ contract GenesixTest is Test {
         vm.stopPrank();
         assertFalse(genesix.approvers(approver));
     }
+
+    /// @notice Test submission approval
+    /// @dev Tests approver can approve a submission with points
+    function test_ApproveSubmission() public {
+        // Setup
+        vm.startPrank(owner);
+        genesix.addApprover(approver);
+        vm.stopPrank();
+
+        // Prepare test data
+        uint256 challengeId = 1;
+        string memory nickname = "player1";
+        uint256[] memory points = new uint256[](6);
+        points[0] = 10;
+        points[1] = 20;
+        points[2] = 30;
+
+        // Submit as approver
+        vm.startPrank(approver);
+        genesix.approveSubmission(challengeId, player, nickname, points);
+        vm.stopPrank();
+
+        // Verify results
+        assertEq(genesix.balanceOf(player), 1);
+        assertEq(genesix.tokenToChallengeId(0), challengeId);
+    }
+
+    /// @notice Test unauthorized submission approval
+    /// @dev Tests that non-approvers cannot approve submissions
+    function test_RevertWhen_UnauthorizedApproval() public {
+        uint256[] memory points = new uint256[](6);
+        
+        vm.expectRevert(abi.encodeWithSelector(Genesix.Unauthorized.selector));
+        vm.prank(player);
+        genesix.approveSubmission(1, player, "player1", points);
+    }
 }

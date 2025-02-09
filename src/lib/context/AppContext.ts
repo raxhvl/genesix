@@ -67,7 +67,7 @@ export interface Approval {
   nickname: string;
   playerAddress: Address;
   challengeId: number;
-  points: number[];
+  points: BigInt[];
 }
 
 export const AppContext = createContext<AppContextType>(defaultContext);
