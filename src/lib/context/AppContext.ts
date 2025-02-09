@@ -44,12 +44,17 @@ const defaultContext: AppContextType = {
   challenges: challenges as Challenge[],
 };
 
+export enum SubmissionPayloadVersion {
+  V1 = "v1",
+}
+
 export interface Submission {
+  version: SubmissionPayloadVersion;
+  chainId: number;
   nickname: string;
   playerAddress: Address;
   challengeId: number;
   responses: Response[];
-  points: number[];
 }
 
 export interface Response {
