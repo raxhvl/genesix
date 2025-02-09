@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "Day 1: Using Ethereum Mainnet",
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Set up a browser wallet",
+        "description": "Set up a browser wallet",
+        "points": 10,
+        "proofType": "image",
+        "difficulty": "easy",
+        "playersRequired": 1
+      },
+      {
+        "id": 2,
+        "title": "Improve the privacy & security of your wallet",
+        "description": "Improve the privacy & security of your wallet",
+        "points": 20,
+        "proofType": "text",
+        "difficulty": "medium",
+        "playersRequired": 1
+      },
+      {
+        "id": 3,
+        "title": "Create a multi-sig wallet",
+        "description": "Create a multi-sig wallet",
+        "points": 15,
+        "proofType": "link",
+        "difficulty": "hard",
+        "playersRequired": 2
+      },
+      {
+        "id": 4,
+        "title": "Stake some ETH in a staking pool",
+        "description": "Stake some ETH in a staking pool",
+        "points": 10,
+        "proofType": "image",
+        "difficulty": "medium",
+        "playersRequired": 1
+      },
+      {
+        "id": 5,
+        "title": "Restake on Eigenlayer",
+        "description": "Restake on Eigenlayer",
+        "points": 15,
+        "proofType": "text",
+        "difficulty": "hard",
+        "playersRequired": 1
+      },
+      {
+        "id": 6,
+        "title": "Use a chain that's not Ethereum",
+        "description": "Use a chain that's not Ethereum",
+        "points": 15,
+        "proofType": "text",
+        "difficulty": "medium",
+        "playersRequired": 1
+      }
+    ]
+  }
+]
