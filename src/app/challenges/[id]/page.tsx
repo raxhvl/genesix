@@ -18,10 +18,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { FileType, generateFilename } from "@/lib/fs";
+import ReactConfetti from "react-confetti";
+import { useRouter } from "next/navigation";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { challenges } = useAppContext();
   const { address, chainId } = useAccount();
+  const router = useRouter();
 
   const { id } = use(params);
   const challengeId = parseInt(id);
@@ -50,6 +54,10 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   });
 
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [submissionId, setSubmissionId] = useState<string>("");
+  const [showConfetti, setShowConfetti] = useState(false);
 
   if (!challenge) {
     return <div>Challenge not found!</div>;
@@ -78,9 +86,83 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     setShowConfirmDialog(true);
   }
 
+  async function getSignedUrl(submission: Submission) {
+    const response = await fetch("/api/upload", {
+      method: "POST",
+      body: JSON.stringify({
+        chainId: submission.chainId,
+        fileType: FileType.CHALLENGE_SUBMISSION,
+        filename: generateFilename(
+          FileType.CHALLENGE_SUBMISSION,
+          submission.playerAddress,
+          submission.challengeId,
+          submission.chainId
+        ),
+        contentType: "application/json",
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to get upload URL");
+    }
+
+    const { signedUrl } = await response.json();
+    return signedUrl;
+  }
+
+  async function uploadSubmission(submission: Submission) {
+    // First get the signed URL
+    const signedUrl = await getSignedUrl(submission);
+
+    // Then upload the actual submission using the signed URL
+    const uploadResponse = await fetch(signedUrl, {
+      method: "PUT",
+      body: JSON.stringify(submission),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log(uploadResponse);
+
+    if (!uploadResponse.ok) {
+      throw new Error("Failed to upload submission");
+    }
+
+    return uploadResponse;
+  }
+
   async function handleConfirmSubmission() {
-    console.log("Final submission:", submission);
-    setShowConfirmDialog(false);
+    try {
+      setIsUploading(true);
+      const submissionFilename = generateFilename(
+        FileType.CHALLENGE_SUBMISSION,
+        submission.playerAddress,
+        submission.challengeId,
+        submission.chainId
+      );
+      await uploadSubmission(submission);
+      setShowConfirmDialog(false);
+      setSubmissionId(submissionFilename);
+      setShowSuccessDialog(true);
+      setShowConfetti(true);
+    } catch (error) {
+      console.error("Upload failed:", error);
+      // TODO: Show error message
+    } finally {
+      setIsUploading(false);
+    }
+  }
+
+  async function copySubmissionId() {
+    await navigator.clipboard.writeText(submissionId);
+    // TODO: Show copy success toast
+  }
+
+  function handleSuccessClose() {
+    setShowSuccessDialog(false);
+    setShowConfetti(false);
+    router.push("/challenges");
   }
 
   return (
@@ -136,10 +218,50 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             <Button
               variant="outline"
               onClick={() => setShowConfirmDialog(false)}
+              disabled={isUploading}
             >
               Cancel
             </Button>
-            <Button onClick={handleConfirmSubmission}>Confirm</Button>
+            <Button onClick={handleConfirmSubmission} disabled={isUploading}>
+              {isUploading ? "Uploading..." : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {showConfetti && (
+        <ReactConfetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={500}
+          onConfettiComplete={() => setShowConfetti(false)}
+        />
+      )}
+
+      <Dialog open={showSuccessDialog} onOpenChange={handleSuccessClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>🎉 Challenge Submitted!</DialogTitle>
+            <DialogDescription>
+              Your submission has been successfully uploaded
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="p-4 bg-muted rounded-lg">
+              <p className="text-sm font-medium mb-2">Submission ID:</p>
+              <code className="break-all">{submissionId}</code>
+            </div>
+            <Button
+              className="w-full"
+              variant="outline"
+              onClick={copySubmissionId}
+            >
+              Copy Submission ID
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleSuccessClose}>Back to Challenges</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

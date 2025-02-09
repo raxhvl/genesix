@@ -53,7 +53,9 @@ contract Genesix is ERC721, Ownable {
     ||         Public API         ||
     ||                            ||
     /*############################*/
-    function submit(uint256 challengeId, address playerAddress, string calldata nickname, uint256[6] calldata answers)
+    //TODO:  rename answers to points
+    //TODO: add challenge to players array.
+    function approve(uint256 challengeId, address playerAddress, string calldata nickname, uint256[6] calldata point)
         public
         onlyApprover
     {
