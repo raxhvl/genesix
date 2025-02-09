@@ -1,4 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
+import { Submission } from "./context/AppContext";
 
 export enum FileType {
   PROOF_IMAGE = "PROOF_IMAGE",
@@ -25,4 +26,15 @@ export function getPath(chainId: number, filename: string, fileType: FileType) {
   const uuidFilename = extension ? `${uuidv4()}.${extension}` : uuidv4();
 
   return `chain-${chainId}/${path}/${uuidFilename}`;
+}
+
+export async function fetchSubmission(
+  chainId: number,
+  submissionId: string
+): Promise<Submission> {
+  const response = await fetch(`/api/submissions/${chainId}/${submissionId}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch submission: ${response.statusText}`);
+  }
+  return response.json();
 }
