@@ -23,9 +23,10 @@ import ReactConfetti from "react-confetti";
 import { useRouter } from "next/navigation";
 import { useWeb3Context } from "@/lib/context/Web3Context";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, User } from "lucide-react";
+import { Copy, HelpCircle, ShieldAlert, User } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { Badge, badgeVariants } from "@/components/ui/badge";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { challenges } = useAppContext();
@@ -160,6 +161,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }
 
   async function handleConfirmSubmission() {
+    if (chainId != 1) {
+      toast({
+        title: "Wrong Chain Selected",
+        description: "Please switch to Ethereum mainnet to submit.",
+        variant: "destructive",
+      });
+      return;
+    }
     try {
       setIsUploading(true);
       const submissionId = await uploadSubmission(submission);
@@ -210,7 +219,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       <div className="space-y-8 w-xl">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">{challenge.title}</h1>
-          <p className="text-muted-foreground">Complete tasks to earn points</p>
+          <p className="text-muted-foreground">
+            {challenge.description}.{" "}
+            <a
+              href={challenge.homepage}
+              target="_blank"
+              className="text-blue-500 text-sm hover:underline"
+            >
+              View challenge homepage 🔗.
+            </a>
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -235,12 +253,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               >
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
-                    <h3 className="text-lg font-semibold">
-                      Task {index + 1}: {task.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm">
-                      {task.description}
-                    </p>
+                    <h3 className="text-lg font-semibold">{task.title}</h3>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Badge>{task.points} points</Badge>
@@ -255,6 +268,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                   task={task}
                   onProofChange={(proof) => handleProofChange(task.id, proof)}
                 />
+                <a
+                  href={task.instructions_url}
+                  className="mt-5 text-sm inline-flex items-center gap-2"
+                  target="_blank"
+                >
+                  <HelpCircle size={16} />
+                  <span className="text-blue-500 hover:underline">
+                    See Instructions
+                  </span>
+                </a>
               </div>
             ))}
           </div>
@@ -272,12 +295,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             <DialogTitle className="text-2xl">
               Confirm Your Submission
             </DialogTitle>
-            <DialogDescription className="text-base">
-              Please review your answers carefully before submitting. You cannot
-              edit them after submission.
-            </DialogDescription>
+            <Alert>
+              <ShieldAlert />
+              <AlertTitle>Review your submission!</AlertTitle>
+              <AlertDescription>
+                Redact any sensitive information before submitting. We’re not
+                looking to break any scandals in the morning news here! 😉
+              </AlertDescription>
+            </Alert>
           </DialogHeader>
-          <div className="space-y-6 my-4">
+          <div className="space-y-2 my-4">
             <div className="bg-muted p-4 rounded-lg">
               <h4 className="font-semibold text-lg mb-4">Submission Details</h4>
               <div className="space-y-4">
@@ -312,7 +339,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
                               rel="noopener noreferrer"
                               className="text-blue-500 hover:underline inline-flex items-center gap-2"
                             >
-                              <span>🔗</span>{" "}
+                              <span>🔗 {response.answer}</span>
                             </a>
                           ) : (
                             "🔗 No answer provided"

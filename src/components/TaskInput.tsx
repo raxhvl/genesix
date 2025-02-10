@@ -107,7 +107,9 @@ export default function TaskInput({
 
   return (
     <div className="space-y-4 w-full">
-      <Label htmlFor={inputId}>{task.title}</Label>
+      <Label className="text-muted-foreground" htmlFor={inputId}>
+        {task.description}
+      </Label>
       {task.proofType === ProofType.LINK && (
         <Input
           type="url"

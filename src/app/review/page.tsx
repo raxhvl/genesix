@@ -99,31 +99,59 @@ export default function Page() {
     }
   }, [isSuccess, isError, error, toast]);
 
+  // Add this helper function at the top of the component
+  const renderTextWithLinks = (text: string) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    return text.split(urlRegex).map((part, i) => {
+      if (part.match(urlRegex)) {
+        return (
+          <a
+            key={i}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-600 hover:underline"
+          >
+            {part}
+          </a>
+        );
+      }
+      return part;
+    });
+  };
+
   return (
-    <div className="container mx-auto p-4 space-y-4">
-      <div className="flex gap-2">
-        <Input
-          value={submissionId}
-          onChange={(e) => setSubmissionId(e.target.value)}
-          placeholder="Enter submission ID"
-        />
-        <Button
-          onClick={() => fetchSubmissionData(submissionId)}
-          disabled={loading || !submissionId}
-        >
-          {loading ? "Loading..." : "Load Submission"}
-        </Button>
+    <div className="container max-w-3xl mx-auto p-4 space-y-4">
+      <div>
+        <div className="flex gap-2">
+          <Input
+            value={submissionId}
+            onChange={(e) => setSubmissionId(e.target.value)}
+            placeholder="Enter submission ID"
+          />
+          <Button
+            onClick={() => fetchSubmissionData(submissionId)}
+            disabled={loading || !submissionId}
+          >
+            {loading ? "Loading..." : "Load Submission"}
+          </Button>
+        </div>
       </div>
 
       {submission && challenge && (
         <Card>
           <CardHeader>
-            <CardTitle>
-              Submission by {submission.nickname}
-              <div className="text-sm font-normal text-muted-foreground">
-                Points: {approvedPoints} / {totalPoints}
+            <div className="flex justify-between items-start">
+              <div>
+                <CardTitle className="text-2xl">{challenge.title}</CardTitle>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Submission by {submission.nickname}
+                </p>
               </div>
-            </CardTitle>
+              <div className="text-xl font-bold text-emerald-600">
+                {approvedPoints} / {totalPoints} points
+              </div>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {submission.responses.map((response, index) => {
@@ -131,7 +159,14 @@ export default function Page() {
               return (
                 <div
                   key={task.id}
-                  className="flex items-start gap-4 p-4 border rounded"
+                  className="flex items-start gap-4 p-4 border rounded group cursor-pointer"
+                  onClick={(e) => {
+                    // Prevent click when selecting text
+                    if (window.getSelection()?.toString()) return;
+                    // Prevent click when clicking links
+                    if ((e.target as HTMLElement).tagName === "A") return;
+                    handleApprove(task.id, !approvedTaskIds.includes(task.id));
+                  }}
                 >
                   <Checkbox
                     id={`task-${task.id}`}
@@ -139,11 +174,15 @@ export default function Page() {
                     onCheckedChange={(checked) =>
                       handleApprove(task.id, checked as boolean)
                     }
+                    className="mt-1"
                   />
                   <div className="flex-1">
-                    <label htmlFor={`task-${task.id}`} className="font-medium">
+                    <div className="font-medium mb-2">
                       {task.title} ({task.points} points)
-                    </label>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      {task.description}
+                    </p>
                     {task.proofType === ProofType.IMAGE && response.images ? (
                       <div className="grid grid-cols-3 gap-4 mt-2">
                         {response.images.map((image, idx) => (
@@ -151,13 +190,19 @@ export default function Page() {
                             key={idx}
                             src={image}
                             alt={`Proof ${idx + 1}`}
-                            className="w-full h-32 object-cover rounded-lg"
+                            className="w-full h-32 object-cover rounded-lg cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(image, "_blank");
+                            }}
                           />
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {response.answer || "No answer provided"}
+                      <p className="text-sm text-muted-foreground">
+                        {renderTextWithLinks(
+                          response.answer || "No answer provided"
+                        )}
                       </p>
                     )}
                   </div>

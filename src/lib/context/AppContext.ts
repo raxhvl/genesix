@@ -24,6 +24,7 @@ export interface Task {
   id: number;
   title: string;
   description: string;
+  instructions_url: string;
   difficulty: ChallengeDifficulty;
   points: number;
   proofType: ProofType;
@@ -34,6 +35,8 @@ export interface Task {
 interface Challenge {
   id: number;
   title: string;
+  description: string;
+  homepage: string;
   tasks: Task[];
 }
 

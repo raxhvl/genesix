@@ -1,68 +1,61 @@
 [
   {
-    "id": 1,
-    "title": "Day 1: Using Ethereum Mainnet",
+    "id": 3,
+    "title": "🎮 Day 3: Gaming & NFTs",
+    "description": " Let's have some fun on chain!",
+    "homepage": "https://www.notion.so/efdn/Gaming-NFTs-18fd9895554180cd88b1d06404a5d669",
     "tasks": [
       {
         "id": 1,
-        "title": "Set up a browser wallet",
-        "description": "Set up a browser wallet",
-        "points": 10,
+        "title": "🎮 Play an Onchain game",
+        "description": "Share a screenshot of your game play as proof of completion.",
+        "instructions_url": "https://www.notion.so/efdn/Play-an-Onchain-game-18fd9895554181dabbd0ef7c914c6185",
+        "points": 15,
         "proofType": "image",
-        "allowMultipleProofs": true,
+        "allowMultipleProofs": false,
         "difficulty": "easy",
         "playersRequired": 1
       },
       {
         "id": 2,
-        "title": "Improve the privacy & security of your wallet",
-        "description": "Improve the privacy & security of your wallet",
-        "points": 20,
-        "proofType": "text",
-        "difficulty": "medium",
+        "title": "🎨 Mint an NFT",
+        "description": "Share the Etherscan transaction URL to your newly minted NFT.",
+        "instructions_url": "https://www.notion.so/efdn/Mint-an-NFT-18fd9895554181c2870bfc16a7113816",
+        "points": 15,
+        "proofType": "link",
+        "difficulty": "easy",
         "playersRequired": 1
       },
       {
         "id": 3,
-        "title": "Create a multi-sig wallet",
-        "description": "Create a multi-sig wallet",
-        "points": 15,
+        "title": "📈 Buy an NFT",
+        "description": "Share the Etherscan URL to your new NFT as proof of completion.",
+        "instructions_url": "https://www.notion.so/efdn/Buy-an-NFT-18fd9895554181488c88f3b23d8b8705",
+        "points": 10,
         "proofType": "link",
-        "difficulty": "hard",
-        "playersRequired": 2
+        "difficulty": "easy",
+        "playersRequired": 1
       },
       {
         "id": 4,
-        "title": "Stake some ETH in a staking pool",
-        "description": "Stake some ETH in a staking pool",
-        "points": 10,
-        "proofType": "image",
-        "difficulty": "medium",
+        "title": "🤑 Sell an NFT",
+        "description": "Share a URL to your NFT that is listed for sale as proof of completion.",
+        "instructions_url": "https://www.notion.so/efdn/Sell-an-NFT-18fd98955541813c91e6f8a97092f72f",
+        "points": 15,
+        "proofType": "link",
+        "difficulty": "easy",
         "playersRequired": 1
       },
       {
         "id": 5,
-        "title": "Restake on Eigenlayer",
-        "description": "Restake on Eigenlayer",
-        "points": 15,
-        "proofType": "text",
-        "difficulty": "hard",
-        "playersRequired": 1
-      },
-      {
-        "id": 6,
-        "title": "Use a chain that's not Ethereum",
-        "description": "Use a chain that's not Ethereum",
-        "points": 15,
-        "proofType": "text",
-        "difficulty": "medium",
+        "title": "[Bonus] 🤑 Shill your NFT",
+        "description": "Share a URL of you promoting the NFT that you just listed for sale.",
+        "instructions_url": "https://www.notion.so/efdn/Sell-an-NFT-18fd98955541813c91e6f8a97092f72f",
+        "points": 10,
+        "proofType": "link",
+        "difficulty": "easy",
         "playersRequired": 1
       }
     ]
-  },
-  {
-    "id": 2,
-    "title": "Day 2: Using Ethereum Mainnet",
-    "tasks": []
   }
 ]
