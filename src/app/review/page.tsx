@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useAppContext } from "@/lib/context/AppContext";
+import { ProofType, useAppContext } from "@/lib/context/AppContext";
 import type { Submission, Approval } from "@/lib/context/AppContext";
 import { useState, useEffect } from "react";
 import { useWeb3Context } from "@/lib/context/Web3Context";
@@ -144,10 +144,22 @@ export default function Page() {
                     <label htmlFor={`task-${task.id}`} className="font-medium">
                       {task.title} ({task.points} points)
                     </label>
-                    review{" "}
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {response.answer || "No answer provided"}
-                    </p>
+                    {task.proofType === ProofType.IMAGE && response.images ? (
+                      <div className="grid grid-cols-3 gap-4 mt-2">
+                        {response.images.map((image, idx) => (
+                          <img
+                            key={idx}
+                            src={image}
+                            alt={`Proof ${idx + 1}`}
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {response.answer || "No answer provided"}
+                      </p>
+                    )}
                   </div>
                 </div>
               );

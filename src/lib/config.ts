@@ -37,3 +37,9 @@ export const getContractAddress = (chainId: number): Address => {
 };
 
 export const abi = Genesix.abi as Abi;
+
+export const imageConfig = {
+  maxFiles: 3,
+  maxSizeInMB: 3,
+  acceptedTypes: ["image/jpeg", "image/png", "image/gif", "image/webp"],
+};

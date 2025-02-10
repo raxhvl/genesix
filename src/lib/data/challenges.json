@@ -9,6 +9,7 @@
         "description": "Set up a browser wallet",
         "points": 10,
         "proofType": "image",
+        "allowMultipleProofs": true,
         "difficulty": "easy",
         "playersRequired": 1
       },

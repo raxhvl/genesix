@@ -2,6 +2,7 @@
 
 import TaskInput from "@/components/TaskInput";
 import {
+  ProofType,
   SubmissionPayloadVersion,
   useAppContext,
 } from "@/lib/context/AppContext";
@@ -21,11 +22,16 @@ import { FileType } from "@/lib/fs";
 import ReactConfetti from "react-confetti";
 import { useRouter } from "next/navigation";
 import { useWeb3Context } from "@/lib/context/Web3Context";
+import { useToast } from "@/hooks/use-toast";
+import { Copy, User } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Badge, badgeVariants } from "@/components/ui/badge";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { challenges } = useAppContext();
   const { playerAddress, chainId } = useWeb3Context();
   const router = useRouter();
+  const { toast } = useToast(); // Add this at the top with other hooks
 
   const { id } = use(params);
   const challengeId = parseInt(id);
@@ -47,6 +53,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         taskId: task.id,
         type: task.proofType,
         answer: "",
+        images: [],
       })) || [],
   });
 
@@ -60,11 +67,24 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     return <div>Challenge not found!</div>;
   }
 
-  function handleProofChange(taskId: number, proof: string) {
+  function handleProofChange(taskId: number, proof: string | string[]) {
+    const task = challenge?.tasks.find((task) => task.id === taskId);
+    if (!task) {
+      throw new Error("Task not found");
+    }
+    const isImageTask = task.proofType === ProofType.IMAGE;
+    const answer = !isImageTask && !Array.isArray(proof) ? proof : "";
+    const images = isImageTask && Array.isArray(proof) ? proof : [];
     setSubmission((prev) => ({
       ...prev,
       responses: prev.responses.map((response) =>
-        response.taskId === taskId ? { ...response, answer: proof } : response
+        response.taskId === taskId
+          ? {
+              ...response,
+              answer,
+              images,
+            }
+          : response
       ),
     }));
   }
@@ -149,15 +169,34 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       setShowConfetti(true);
     } catch (error) {
       console.error("Upload failed:", error);
-      // TODO: Show error message
+      toast({
+        variant: "destructive",
+        title: "Submission Failed",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to upload submission. Please try again.",
+      });
     } finally {
       setIsUploading(false);
     }
   }
 
   async function copySubmissionId() {
-    await navigator.clipboard.writeText(submissionId);
-    // TODO: Show copy success toast
+    try {
+      await navigator.clipboard.writeText(submissionId);
+      toast({
+        title: "Copied!",
+        description: "Submission ID copied to clipboard",
+        duration: 2000,
+      });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Copy Failed",
+        description: "Failed to copy submission ID. Please try again.",
+      });
+    }
   }
 
   function handleSuccessClose() {
@@ -167,64 +206,190 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }
 
   return (
-    <>
-      <form onSubmit={handleSubmit} className="grid w-full gap-2">
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-2">
-            Your Nickname
-          </label>
-          <Input
-            value={submission.nickname}
-            onChange={(e) => handleNicknameChange(e.target.value)}
-            placeholder="Enter your nickname"
-            required
-          />
+    <div className="container max-w-3xl mx-auto py-8 px-4">
+      <div className="space-y-8 w-xl">
+        <div className="space-y-2">
+          <h1 className="text-3xl font-bold">{challenge.title}</h1>
+          <p className="text-muted-foreground">Complete tasks to earn points</p>
         </div>
 
-        {challenge.tasks.map((task) => (
-          <div key={task.id}>
-            <div>
-              <h3>{task.title}</h3>
-              <p>{task.description}</p>
-            </div>
-            <div>
-              <TaskInput
-                task={task}
-                onProofChange={(proof) => handleProofChange(task.id, proof)}
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="bg-card p-6 rounded-lg border shadow-sm">
+            <label className="text-base font-semibold mb-2 block">
+              Your Nickname (required)
+            </label>
+            <Input
+              value={submission.nickname}
+              onChange={(e) => handleNicknameChange(e.target.value)}
+              placeholder="Enter your nickname"
+              required
+              className="bg-background text-foreground"
+            />
           </div>
-        ))}
-        <Button type="submit">Submit</Button>
-      </form>
 
-      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Submission</DialogTitle>
-            <DialogDescription>
-              Review your answers before you submit
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-2">
-            <h4 className="font-medium">Your answers:</h4>
-            {submission.responses.map((response, index) => (
-              <div key={response.taskId} className="text-sm">
-                <span className="font-medium">Task {index + 1}:</span>{" "}
-                {response.answer || "No answer provided"}
+          <div className="space-y-6 ">
+            {challenge.tasks.map((task, index) => (
+              <div
+                key={task.id}
+                className="bg-card p-6 rounded-lg border space-y-4"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-semibold">
+                      Task {index + 1}: {task.title}
+                    </h3>
+                    <p className="text-muted-foreground text-sm">
+                      {task.description}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Badge>{task.points} points</Badge>
+
+                    <Badge variant="secondary">
+                      {task.difficulty.toLocaleUpperCase()}
+                    </Badge>
+                  </div>
+                </div>
+                <TaskInput
+                  chainId={chainId}
+                  task={task}
+                  onProofChange={(proof) => handleProofChange(task.id, proof)}
+                />
               </div>
             ))}
           </div>
-          <DialogFooter>
+
+          <Button type="submit" size="lg" className="w-full md:w-auto">
+            Review Submission
+          </Button>
+        </form>
+      </div>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <DialogContent>
+          <DialogHeader className="space-y-3">
+            <DialogTitle className="text-2xl">
+              Confirm Your Submission
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              Please review your answers carefully before submitting. You cannot
+              edit them after submission.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 my-4">
+            <div className="bg-muted p-4 rounded-lg">
+              <h4 className="font-semibold text-lg mb-4">Submission Details</h4>
+              <div className="space-y-4">
+                <div className="border-b">
+                  <h5 className="font-bold text-base mb-1">Nickname</h5>
+                  <p className="text-sm text-muted-foreground">
+                    👤 {submission.nickname}
+                  </p>
+                </div>
+                {submission.responses.map((response) => {
+                  const task = challenge.tasks.find(
+                    (t) => t.id === response.taskId
+                  );
+                  if (!task) return null;
+
+                  return (
+                    <div key={response.taskId} className="space-y-1.5">
+                      <h5 className="font-bold text-base">{task.title}</h5>
+                      <div className="text-sm text-muted-foreground">
+                        {response.images.length > 0 ? (
+                          <div className="flex items-center gap-2">
+                            <span>📸</span>
+                            <span>
+                              {response.images.length} image(s) uploaded
+                            </span>
+                          </div>
+                        ) : task.proofType === ProofType.LINK ? (
+                          response.answer ? (
+                            <a
+                              href={response.answer}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:underline inline-flex items-center gap-2"
+                            >
+                              <span>🔗</span>{" "}
+                            </a>
+                          ) : (
+                            "🔗 No answer provided"
+                          )
+                        ) : (
+                          <div className="flex items-start gap-2">
+                            <span>📝</span>
+                            <span>
+                              {response.answer || "No answer provided"}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="gap-3 sm:gap-0">
             <Button
               variant="outline"
               onClick={() => setShowConfirmDialog(false)}
               disabled={isUploading}
             >
-              Cancel
+              Back to Edit
             </Button>
-            <Button onClick={handleConfirmSubmission} disabled={isUploading}>
-              {isUploading ? "Uploading..." : "Confirm"}
+            <Button
+              onClick={handleConfirmSubmission}
+              disabled={isUploading}
+              className="min-w-[100px]"
+            >
+              {isUploading ? (
+                <div className="flex items-center gap-2">
+                  <span className="animate-spin">◌</span>
+                  <span>Submitting...</span>
+                </div>
+              ) : (
+                "Submit"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Dialog */}
+      <Dialog open={showSuccessDialog} onOpenChange={handleSuccessClose}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-2xl">
+              🎉 Challenge Submitted!
+            </DialogTitle>
+            <DialogDescription className="text-base">
+              Your submission has been successfully uploaded. Share your
+              submission ID with the moderator for review.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2">
+            <div className="grid flex-1 gap-2">
+              <Label htmlFor="link" className="sr-only">
+                Submission ID:
+              </Label>
+              <Input id="link" defaultValue={submissionId} readOnly />
+            </div>
+            <Button
+              type="submit"
+              size="sm"
+              className="px-3"
+              onClick={copySubmissionId}
+            >
+              <span className="sr-only">Copy</span>
+              <Copy />
+            </Button>
+          </div>
+          <DialogFooter>
+            <Button onClick={handleSuccessClose} className="w-full sm:w-auto">
+              Back to Challenges
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -239,33 +404,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           onConfettiComplete={() => setShowConfetti(false)}
         />
       )}
-
-      <Dialog open={showSuccessDialog} onOpenChange={handleSuccessClose}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>🎉 Challenge Submitted!</DialogTitle>
-            <DialogDescription>
-              Your submission has been successfully uploaded
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="p-4 bg-muted rounded-lg">
-              <p className="text-sm font-medium mb-2">Submission ID:</p>
-              <code className="break-all">{submissionId}</code>
-            </div>
-            <Button
-              className="w-full"
-              variant="outline"
-              onClick={copySubmissionId}
-            >
-              Copy Submission ID{" "}
-            </Button>{" "}
-          </div>
-          <DialogFooter>
-            <Button onClick={handleSuccessClose}>Back to Challenges</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </>
+    </div>
   );
 }

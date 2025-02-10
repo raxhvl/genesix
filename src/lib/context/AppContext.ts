@@ -14,7 +14,7 @@ enum ChallengeDifficulty {
   HARD = "hard",
 }
 
-enum ProofType {
+export enum ProofType {
   IMAGE = "image",
   TEXT = "text",
   LINK = "link",
@@ -27,6 +27,7 @@ export interface Task {
   difficulty: ChallengeDifficulty;
   points: number;
   proofType: ProofType;
+  allowMultipleProofs: boolean;
   playersRequired: number;
 }
 
@@ -60,7 +61,8 @@ export interface Submission {
 export interface Response {
   taskId: number;
   type: ProofType;
-  answer?: string;
+  answer: string;
+  images: string[];
 }
 
 export interface Approval {
