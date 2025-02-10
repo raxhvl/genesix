@@ -5,6 +5,7 @@ import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Address } from "viem";
+import Home from "@/app/page";
 
 interface Web3ContextType {
   chainId: number;
@@ -25,7 +26,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   }, [isConnected, router]);
 
   if (!isConnected || !address || !chainId) {
-    return null;
+    return <Home />;
   }
 
   return (
