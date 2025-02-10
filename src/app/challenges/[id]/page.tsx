@@ -424,10 +424,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
       {showConfetti && (
         <ReactConfetti
-          width={window.innerWidth}
-          height={window.innerHeight}
+          style={{ position: "fixed", top: 0, left: 0, zIndex: 9999 }}
           recycle={false}
-          numberOfPieces={500}
+          numberOfPieces={1000}
+          gravity={0.2}
+          initialVelocityY={30}
+          tweenDuration={6000}
+          friction={0.96}
+          wind={0.05}
           onConfettiComplete={() => setShowConfetti(false)}
         />
       )}
