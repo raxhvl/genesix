@@ -173,7 +173,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }
 
   async function handleConfirmSubmission() {
-    if (chainId != 1 && false) {
+    if (chainId != 1) {
       toast({
         title: "Wrong Chain Selected",
         description: "Please switch to Ethereum mainnet to submit.",
