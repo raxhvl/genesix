@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
 
-import {Test, console} from "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 import {Genesix} from "../src/Genesix.sol";
 
-/// @title Genesix Contract Tests
-/// @notice Test suite for the Genesix NFT contract
 contract GenesixTest is Test {
     Genesix public genesix;
     address owner = makeAddr("owner");
@@ -14,96 +12,96 @@ contract GenesixTest is Test {
 
     function setUp() public {
         genesix = new Genesix(owner);
+        vm.prank(owner);
+        genesix.addApprover(approver);
     }
 
-    /// @notice Test initial contract state after deployment
-    /// @dev Verifies owner address, token name and symbol
-    function test_InitialState() public view {
+    function _createPoints(uint256[] memory values) internal pure returns (uint256[] memory) {
+        uint256[] memory points = new uint256[](values.length);
+        for(uint256 i = 0; i < values.length; i++) {
+            points[i] = values[i];
+        }
+        return points;
+    }
+
+    function _submitChallenge(
+        uint256 challengeId,
+        string memory submissionId,
+        uint256[] memory points
+    ) internal {
+        vm.prank(approver);
+        genesix.approveSubmission(
+            challengeId,
+            submissionId,
+            player,
+            "player1",
+            points
+        );
+    }
+
+    function test_InitialState() public {
         assertEq(genesix.owner(), owner);
         assertEq(genesix.name(), "Onchain Days");
         assertEq(genesix.symbol(), "OCD");
     }
 
-    /// @notice Test adding an approver
-    /// @dev Tests owner can add approver and verifies approver status
-    function test_AddApprover() public {
-        vm.prank(owner);
-        genesix.addApprover(approver);
-        vm.stopPrank();
-        assertTrue(genesix.approvers(approver));
-    }
-
-    /// @notice Test removing an approver
-    /// @dev Tests owner can remove previously added approver
-    function test_RemoveApprover() public {
-        test_AddApprover();
+    function test_ApproverManagement() public {
+        assertTrue(genesix.isApprover(approver));
+        
         vm.prank(owner);
         genesix.removeApprover(approver);
-        vm.stopPrank();
-        assertFalse(genesix.approvers(approver));
+        assertFalse(genesix.isApprover(approver));
     }
 
-    /// @notice Test submission approval
-    /// @dev Tests approver can approve a submission with points
-    function test_ApproveSubmission() public {
-        // Setup
-        vm.startPrank(owner);
-        genesix.addApprover(approver);
-        vm.stopPrank();
+    function test_SingleSubmission() public {
+        uint256[] memory values = new uint256[](3);
+        values[0] = 10;
+        values[1] = 20;
+        values[2] = 30;
+        uint256[] memory points = _createPoints(values);
+        _submitChallenge(1, "sub-1", points);
 
-        // Prepare test data
-        uint256 challengeId = 1;
-        string memory nickname = "player1";
-        uint256[] memory points = new uint256[](6);
-        points[0] = 10;
-        points[1] = 20;
-        points[2] = 30;
-
-        // Submit as approver
-        vm.startPrank(approver);
-        genesix.approveSubmission(challengeId, player, nickname, points);
-        vm.stopPrank();
-
-        // Verify results
         assertEq(genesix.balanceOf(player), 1);
-        assertEq(genesix.tokenToChallengeId(0), challengeId);
-    }
-
-    /// @notice Test getting challenge points
-    /// @dev Tests retrieving points for a specific challenge after submission
-    function test_GetChallengePoints() public {
-        // Setup
-        vm.startPrank(owner);
-        genesix.addApprover(approver);
-        vm.stopPrank();
-
-        // Prepare test data
-        uint256 challengeId = 1;
-        string memory nickname = "player1";
-        uint256[] memory points = new uint256[](3);
-        points[0] = 10;
-        points[1] = 20;
-        points[2] = 30;
-
-        // Submit as approver
-        vm.prank(approver);
-        genesix.approveSubmission(challengeId, player, nickname, points);
-
-        // Get and verify points
-        uint256[] memory retrievedPoints = genesix.getChallengePoints(player, challengeId);
-        assertEq(retrievedPoints.length, points.length);
-        for(uint256 i = 0; i < points.length; i++) {
-            assertEq(retrievedPoints[i], points[i]);
-        }
-    }
-
-    /// @notice Test unauthorized submission approval
-    /// @dev Tests that non-approvers cannot approve submissions
-    function test_RevertWhen_UnauthorizedApproval() public {
-        uint256[] memory points = new uint256[](6);
         
-        vm.expectRevert(abi.encodeWithSelector(Genesix.Unauthorized.selector));
+        uint256[] memory retrieved = genesix.getSubmissionPoints(player, 1, "sub-1");
+        assertEq(retrieved[0], 10);
+        assertEq(retrieved[1], 20);
+        assertEq(retrieved[2], 30);
+    }
+
+    function test_MultipleSubmissions() public {
+        uint256[] memory values1 = new uint256[](3);
+        values1[0] = 10;
+        values1[1] = 20;
+        values1[2] = 30;
+        
+        uint256[] memory values2 = new uint256[](3);
+        values2[0] = 15;
+        values2[1] = 25;
+        values2[2] = 35;
+
+        _submitChallenge(1, "sub-1", _createPoints(values1));
+        _submitChallenge(1, "sub-2", _createPoints(values2));
+
+        assertEq(genesix.balanceOf(player), 2);
+        
+        uint256[] memory sub1 = genesix.getSubmissionPoints(player, 1, "sub-1");
+        uint256[] memory sub2 = genesix.getSubmissionPoints(player, 1, "sub-2");
+        
+        assertEq(sub1[0], 10);
+        assertEq(sub2[0], 15);
+    }
+
+    function test_RevertUnauthorized() public {
         vm.prank(player);
-        genesix.approveSubmission(1, player, "player1", points);
+        vm.expectRevert(abi.encodeWithSelector(Genesix.Unauthorized.selector));
+        genesix.approveSubmission(1, "sub-1", player, "player1", new uint256[](3));
+    }
+
+    function test_RevertChallengeIdMismatch() public {
+        _submitChallenge(1, "sub-1", new uint256[](3));
+        
+        vm.expectRevert(abi.encodeWithSelector(Genesix.ChallengeMismatch.selector, 1, 2));
+        genesix.getSubmissionPoints(player, 2, "sub-1");
     }
 }

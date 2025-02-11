@@ -20,15 +20,19 @@ contract Genesix is ERC721, Ownable {
     ||           State           ||
     /*###########################*/
     uint256 private _nextTokenId;
-    mapping(address approver => bool isApproved) public approvers;
+    mapping(address => bool) public isApprover;
+
+    struct Submission {
+        uint256 challengeId;
+        uint256[] points;
+    }
 
     struct Player {
         string nickname;
-        mapping(uint256 challengeId => uint256[] points) points;
+        mapping(string submissionId => Submission) submissions;
     }
 
-    mapping(address => Player) public players;
-    mapping(uint256 tokenId => uint256 challengeId) public tokenToChallengeId;
+    mapping(address => Player) public profiles;
 
     /*############################/*
     ||           Events           ||
@@ -40,14 +44,21 @@ contract Genesix is ERC721, Ownable {
     ||            Errors          ||
     /*############################*/
     /// @notice Thrown when a caller doesn't have required permissions
-    /// @dev User is not authorized to perform the requested action
     error Unauthorized();
+    /// @notice Thrown when attempting to access a submission with wrong challenge ID
+    /// @param expected The challenge ID that was expected
+    /// @param actual The challenge ID that was provided
+    error ChallengeMismatch(uint256 expected, uint256 actual);
+    /// @notice Thrown when trying to add an address that is already an approver
+    error AlreadyApprover(address account);
+    /// @notice Thrown when trying to remove an address that is not an approver
+    error NotApprover(address account);
 
     /*############################/*
     ||         Modifiers          ||
     /*############################*/
     modifier onlyApprover() {
-        require(approvers[msg.sender], Unauthorized());
+        require(isApprover[msg.sender], Unauthorized());
         _;
     }
 
@@ -59,64 +70,74 @@ contract Genesix is ERC721, Ownable {
     ||                            ||
     /*############################*/
     
-    /// @notice Get the points earned by a player for a specific challenge
-    /// @param playerAddress The address of the player
-    /// @param challengeId The ID of the challenge
-    /// @return An array of points earned for the challenge
-    function getChallengePoints(address playerAddress, uint256 challengeId) public view returns (uint256[] memory) {
-        return players[playerAddress].points[challengeId];
-    }
 
     //TODO:  rename answers to points
     //TODO: add challenge to players array.
     /// @notice Approve a player's challenge submission and mint an NFT
     /// @param challengeId The ID of the challenge being submitted
+    /// @param submissionId The ID of the submission
     /// @param playerAddress The address of the player submitting the challenge
     /// @param nickname The nickname of the player (optional if already set)
     /// @param points Array of points earned for the challenge
     /// @dev Only callable by approved approvers
-    function approveSubmission(uint256 challengeId, address playerAddress, string calldata nickname, uint256[] calldata points)
-        public
-        onlyApprover
-    {
-        Player storage player = players[playerAddress];
+    function approveSubmission(
+        uint256 challengeId,
+        string calldata submissionId,
+        address playerAddress,
+        string calldata nickname,
+        uint256[] calldata points
+    ) public onlyApprover {
+        Player storage profile = profiles[playerAddress];
 
         // Players may submit challenges in any order.
         // This allows them to update their nickname, if not already set.
-        if (bytes(nickname).length > 0 && keccak256(bytes(player.nickname)) != keccak256(bytes(nickname))) {
-            player.nickname = nickname;
+        if (bytes(nickname).length > 0 && keccak256(bytes(profile.nickname)) != keccak256(bytes(nickname))) {
+            profile.nickname = nickname;
         }
 
-        for (uint256 i = 0; i < points.length; i++) {
-            player.points[challengeId].push(points[i]);
+        profile.submissions[submissionId] = Submission({
+            challengeId: challengeId,
+            points: points
+        });
+
+        // Mint NFT without tracking challenge
+        _safeMint(playerAddress, _nextTokenId++);
+    }
+
+    /// @notice Get points for a specific submission
+    /// @param playerAddress The address of the player
+    /// @param challengeId The ID of the challenge
+    /// @param submissionId The ID of the submission
+    /// @return points Array of points from the submission
+    function getSubmissionPoints(
+        address playerAddress,
+        uint256 challengeId,
+        string calldata submissionId
+    ) public view returns (uint256[] memory) {
+        Submission memory submission = profiles[playerAddress].submissions[submissionId];
+        if (submission.challengeId != challengeId) {
+            revert ChallengeMismatch(submission.challengeId, challengeId);
         }
-
-        uint256 tokenId = _nextTokenId++;
-
-        // Record an NFT against a challenge and mint it.
-        tokenToChallengeId[tokenId] = challengeId;
-        _safeMint(playerAddress, tokenId);
+        return submission.points;
     }
 
     // Approver management
     /// @notice Add a new approver address
-    /// @param _approver The address to be granted approver rights
+    /// @param account The address to be granted approver rights
     /// @dev Only callable by contract owner
-    function addApprover(address _approver) external onlyOwner {
-        // TODO: define a customer error?
-        require(!approvers[_approver], "Already approver");
-        approvers[_approver] = true;
-        emit ApproverAdded(_approver);
+    function addApprover(address account) external onlyOwner {
+        if (isApprover[account]) revert AlreadyApprover(account);
+        isApprover[account] = true;
+        emit ApproverAdded(account);
     }
 
     /// @notice Remove an existing approver
-    /// @param _approver The address to remove approver rights from
+    /// @param account The address to remove approver rights from
     /// @dev Only callable by contract owner
-    function removeApprover(address _approver) external onlyOwner {
-        // TODO: define a customer error?
-        require(approvers[_approver], "Not approver");
-        approvers[_approver] = false;
-        emit ApproverRemoved(_approver);
+    function removeApprover(address account) external onlyOwner {
+        if (!isApprover[account]) revert NotApprover(account);
+        isApprover[account] = false;
+        emit ApproverRemoved(account);
     }
 
     /*############################/*

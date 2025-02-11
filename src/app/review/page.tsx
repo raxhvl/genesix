@@ -70,6 +70,7 @@ export default function Page() {
       functionName: "approveSubmission",
       args: [
         submission.challengeId,
+        submissionId,
         submission.playerAddress,
         submission.nickname,
         challenge?.tasks?.map((task) =>
