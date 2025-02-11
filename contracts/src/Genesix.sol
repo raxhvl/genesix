@@ -91,12 +91,10 @@ contract Genesix is ERC721, Ownable {
 
     /// @notice Contract constructor
     /// @param initialOwner The address that will own the contract
-    /// @param _deadline The Unix timestamp after which submissions are no longer accepted
     constructor(
-        address initialOwner,
-        uint256 _deadline
+        address initialOwner
     ) ERC721("Onchain Days", "OCD") Ownable(initialOwner) {
-        deadline = _deadline;
+        deadline = 1739491200;
     }
 
     /*############################/*

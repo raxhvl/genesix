@@ -12,8 +12,8 @@ contract GenesixTest is Test {
     uint256 deadline;
 
     function setUp() public {
-        deadline = block.timestamp + 3 days;
-        genesix = new Genesix(owner, deadline);
+        genesix = new Genesix(owner);
+        deadline = genesix.deadline();
         vm.prank(owner);
         genesix.addApprover(approver);
     }
@@ -149,7 +149,7 @@ contract GenesixTest is Test {
 
     function test_DeadlineZeroMeansNoDeadline() public {
         // Deploy new contract with no deadline
-        genesix = new Genesix(owner, 0);
+        genesix = new Genesix(owner);
         vm.prank(owner);
         genesix.addApprover(approver);
         

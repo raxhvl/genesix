@@ -20,7 +20,7 @@ contract Launch is Script {
     function run() public {
         vm.startBroadcast();
 
-        genesix = new Genesix(wallet, block.timestamp + 2 days);
+        genesix = new Genesix(wallet);
         genesix.addApprover(wallet);
 
         vm.stopBroadcast();
