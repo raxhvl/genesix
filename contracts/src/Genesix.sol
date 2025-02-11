@@ -83,7 +83,7 @@ contract Genesix is ERC721, Ownable {
 
     /// @notice Check if contract deadline has passed
     modifier beforeDeadline() {
-        if (deadline != 0 && block.timestamp > deadline) {
+        if (block.timestamp > deadline) {
             revert DeadlineExceeded(deadline, block.timestamp);
         }
         _;
