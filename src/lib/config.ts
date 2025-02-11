@@ -43,3 +43,7 @@ export const imageConfig = {
   maxSizeInMB: 3,
   acceptedTypes: ["image/jpeg", "image/png", "image/gif", "image/webp"],
 };
+
+export const reviewerAddresses: Address[] = [
+  "0x5a9d681201fedb563B29D3099628c2c6fA1BBDD8",
+];

@@ -77,6 +77,10 @@ forge test
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
+## Known issues
+
+- It is possible to view other people's answers IF you know the submission ID.
+
 ## ⚠️ Disclaimer
 
 This was mostly built on a weekend, and I'm no [Ken Thompson.](https://www.linfo.org/thompson.html)

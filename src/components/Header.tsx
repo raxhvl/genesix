@@ -5,8 +5,11 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { Blocks, ScrollText, Settings2 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useWeb3Context } from "@/lib/context/Web3Context";
 
 export default function Header() {
+  const { isReviewer } = useWeb3Context();
+
   if (isRootPage()) return null;
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -23,18 +26,14 @@ export default function Header() {
             Challenges
           </Button>
         </Link>
-        {/* <Link href="/review">
-          <Button variant="ghost" className="flex items-center gap-2">
-            <ScrollText className="h-4 w-4" />
-            Review
-          </Button>
-        </Link> */}
-        {/* <Link href="/settings">
-          <Button variant="ghost" className="flex items-center gap-2">
-            <Settings2 className="h-4 w-4" />
-            Settings
-          </Button>
-        </Link> */}
+        {isReviewer && (
+          <Link href="/review">
+            <Button variant="ghost" className="flex items-center gap-2">
+              <ScrollText className="h-4 w-4" />
+              Review
+            </Button>
+          </Link>
+        )}
         <div className="ml-auto">
           <ConnectButton />
         </div>
