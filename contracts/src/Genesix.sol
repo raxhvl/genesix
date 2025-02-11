@@ -39,6 +39,19 @@ contract Genesix is ERC721, Ownable {
     /*############################*/
     event ApproverAdded(address indexed approver);
     event ApproverRemoved(address indexed approver);
+    /// @notice Emitted when a submission is approved
+    /// @param playerAddress The address of the player who submitted
+    /// @param challengeId The ID of the challenge
+    /// @param submissionId The unique ID of the submission
+    /// @param points The array of points awarded for each task
+    /// @param tokenId The ID of the NFT minted for this submission
+    event SubmissionApproved(
+        address indexed playerAddress,
+        uint256 indexed challengeId,
+        string submissionId,
+        uint256[] points,
+        uint256 indexed tokenId
+    );
 
     /*############################/*
     ||            Errors          ||
@@ -89,9 +102,8 @@ contract Genesix is ERC721, Ownable {
     ) public onlyApprover {
         Player storage profile = profiles[playerAddress];
 
-        // Players may submit challenges in any order.
-        // This allows them to update their nickname, if not already set.
-        if (bytes(nickname).length > 0 && keccak256(bytes(profile.nickname)) != keccak256(bytes(nickname))) {
+        // Only set nickname if it hasn't been set before
+        if (bytes(nickname).length > 0 && bytes(profile.nickname).length == 0) {
             profile.nickname = nickname;
         }
 
@@ -100,8 +112,16 @@ contract Genesix is ERC721, Ownable {
             points: points
         });
 
-        // Mint NFT without tracking challenge
-        _safeMint(playerAddress, _nextTokenId++);
+        uint256 tokenId = _nextTokenId++;
+        _safeMint(playerAddress, tokenId);
+
+        emit SubmissionApproved(
+            playerAddress,
+            challengeId,
+            submissionId,
+            points,
+            tokenId
+        );
     }
 
     /// @notice Get points for a specific submission
@@ -109,7 +129,7 @@ contract Genesix is ERC721, Ownable {
     /// @param challengeId The ID of the challenge
     /// @param submissionId The ID of the submission
     /// @return points Array of points from the submission
-    function getSubmissionPoints(
+    function getPoints(
         address playerAddress,
         uint256 challengeId,
         string calldata submissionId
@@ -119,6 +139,13 @@ contract Genesix is ERC721, Ownable {
             revert ChallengeMismatch(submission.challengeId, challengeId);
         }
         return submission.points;
+    }
+
+    /// @notice Get a player's nickname
+    /// @param playerAddress The address of the player
+    /// @return The player's nickname
+    function getNickname(address playerAddress) public view returns (string memory) {
+        return profiles[playerAddress].nickname;
     }
 
     // Approver management
