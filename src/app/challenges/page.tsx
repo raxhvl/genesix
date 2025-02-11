@@ -12,14 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  ExternalLink,
-  Trophy,
-  Users,
-  Play,
-  FileText,
-  Info,
-} from "lucide-react"; // Add FileText icon
+import { ExternalLink, Trophy, Users, Play, Info } from "lucide-react"; // Add FileText icon
 
 export default function Page() {
   const { challenges } = useAppContext();
