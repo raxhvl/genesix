@@ -21,6 +21,7 @@ contract Genesix is ERC721, Ownable {
     /*###########################*/
     uint256 private _nextTokenId;
     mapping(address => bool) public isApprover;
+    uint256 public immutable deadline;
 
     struct Submission {
         uint256 challengeId;
@@ -66,6 +67,10 @@ contract Genesix is ERC721, Ownable {
     error AlreadyApprover(address account);
     /// @notice Thrown when trying to remove an address that is not an approver
     error NotApprover(address account);
+    /// @notice Thrown when trying to perform an action after the deadline
+    /// @param deadline The deadline that was missed
+    /// @param currentTime The current block timestamp
+    error DeadlineExceeded(uint256 deadline, uint256 currentTime);
 
     /*############################/*
     ||         Modifiers          ||
@@ -75,7 +80,23 @@ contract Genesix is ERC721, Ownable {
         _;
     }
 
-    constructor(address initialOwner) ERC721("Onchain Days", "OCD") Ownable(initialOwner) {}
+    /// @notice Check if contract deadline has passed
+    modifier beforeDeadline() {
+        if (deadline != 0 && block.timestamp > deadline) {
+            revert DeadlineExceeded(deadline, block.timestamp);
+        }
+        _;
+    }
+
+    /// @notice Contract constructor
+    /// @param initialOwner The address that will own the contract
+    /// @param _deadline The Unix timestamp after which submissions are no longer accepted
+    constructor(
+        address initialOwner,
+        uint256 _deadline
+    ) ERC721("Onchain Days", "OCD") Ownable(initialOwner) {
+        deadline = _deadline;
+    }
 
     /*############################/*
     ||                            ||
@@ -99,7 +120,7 @@ contract Genesix is ERC721, Ownable {
         address playerAddress,
         string calldata nickname,
         uint256[] calldata points
-    ) public onlyApprover {
+    ) public onlyApprover beforeDeadline {
         Player storage profile = profiles[playerAddress];
 
         // Only set nickname if it hasn't been set before
@@ -151,8 +172,8 @@ contract Genesix is ERC721, Ownable {
     // Approver management
     /// @notice Add a new approver address
     /// @param account The address to be granted approver rights
-    /// @dev Only callable by contract owner
-    function addApprover(address account) external onlyOwner {
+    /// @dev Only callable by contract owner and before any challenge deadline
+    function addApprover(address account) external onlyOwner beforeDeadline {
         if (isApprover[account]) revert AlreadyApprover(account);
         isApprover[account] = true;
         emit ApproverAdded(account);
@@ -160,8 +181,8 @@ contract Genesix is ERC721, Ownable {
 
     /// @notice Remove an existing approver
     /// @param account The address to remove approver rights from
-    /// @dev Only callable by contract owner
-    function removeApprover(address account) external onlyOwner {
+    /// @dev Only callable by contract owner and before any challenge deadline
+    function removeApprover(address account) external onlyOwner beforeDeadline {
         if (!isApprover[account]) revert NotApprover(account);
         isApprover[account] = false;
         emit ApproverRemoved(account);

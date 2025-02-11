@@ -9,9 +9,11 @@ contract GenesixTest is Test {
     address owner = makeAddr("owner");
     address approver = makeAddr("approver");
     address player = makeAddr("player");
+    uint256 deadline;
 
     function setUp() public {
-        genesix = new Genesix(owner);
+        deadline = block.timestamp + 3 days;
+        genesix = new Genesix(owner, deadline);
         vm.prank(owner);
         genesix.addApprover(approver);
     }
@@ -124,5 +126,63 @@ contract GenesixTest is Test {
 
         // Verify the original nickname sticks using the getter
         assertEq(genesix.getNickname(player), "original-nickname");
+    }
+
+    function test_SetAndEnforceDeadline() public {
+        uint256[] memory points = new uint256[](3);
+        
+        // Submission before deadline should work
+        _submitChallenge(1, "sub-1", points, "player1");
+        assertEq(genesix.balanceOf(player), 1);
+
+        // Warp to after deadline
+        vm.warp(deadline + 1);
+
+        // Submission after deadline should fail
+        vm.expectRevert(abi.encodeWithSelector(
+            Genesix.DeadlineExceeded.selector,
+            deadline,
+            deadline + 1
+        ));
+        _submitChallenge(1, "sub-2", points, "");
+    }
+
+    function test_DeadlineZeroMeansNoDeadline() public {
+        // Deploy new contract with no deadline
+        genesix = new Genesix(owner, 0);
+        vm.prank(owner);
+        genesix.addApprover(approver);
+        
+        // Warp far into the future
+        vm.warp(block.timestamp + 3 days);
+
+        // Submission should still work
+        uint256[] memory points = new uint256[](3);
+        _submitChallenge(1, "sub-1", points, "player1");
+        assertEq(genesix.balanceOf(player), 1);
+    }
+
+    function test_RevertApproverManagementAfterDeadline() public {
+        // Warp to after deadline
+        vm.warp(deadline + 1);
+
+        // Try to add new approver after deadline
+        address newApprover = makeAddr("newApprover");
+        vm.prank(owner);
+        vm.expectRevert(abi.encodeWithSelector(
+            Genesix.DeadlineExceeded.selector,
+            deadline,
+            deadline + 1
+        ));
+        genesix.addApprover(newApprover);
+
+        // Try to remove approver after deadline
+        vm.prank(owner);
+        vm.expectRevert(abi.encodeWithSelector(
+            Genesix.DeadlineExceeded.selector,
+            deadline,
+            deadline + 1
+        ));
+        genesix.removeApprover(approver);
     }
 }
