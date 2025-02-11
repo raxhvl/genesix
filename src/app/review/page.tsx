@@ -31,10 +31,10 @@ export default function Page() {
     : null;
 
   const totalPoints =
-    challenge?.tasks.reduce((acc, task) => acc + task.points, 0) ?? 0;
+    challenge?.tasks?.reduce((acc, task) => acc + task.points, 0) ?? 0;
   const approvedPoints =
     challenge?.tasks
-      .filter((task) => approvedTaskIds.includes(task.id))
+      ?.filter((task) => approvedTaskIds.includes(task.id))
       .reduce((acc, task) => acc + task.points, 0) ?? 0;
 
   async function fetchSubmissionData(id: string) {
@@ -72,7 +72,7 @@ export default function Page() {
         submission.challengeId,
         submission.playerAddress,
         submission.nickname,
-        challenge.tasks.map((task) =>
+        challenge?.tasks?.map((task) =>
           approvedTaskIds.includes(task.id) ? BigInt(task.points) : BigInt(0)
         ),
       ],
@@ -155,7 +155,9 @@ export default function Page() {
           </CardHeader>
           <CardContent className="space-y-4">
             {submission.responses.map((response, index) => {
-              const task = challenge.tasks[index];
+              const task = challenge?.tasks?.[index];
+              if (!task) return null;
+
               return (
                 <div
                   key={task.id}
