@@ -41,8 +41,6 @@ contract Genesix is ERC721, Ownable {
     /*############################/*
     ||           Events           ||
     /*############################*/
-    event ApproverAdded(address indexed approver);
-    event ApproverRemoved(address indexed approver);
     /// @notice Emitted when a submission is approved
     /// @param playerAddress The address of the player who submitted
     /// @param challengeId The ID of the challenge
@@ -180,7 +178,6 @@ contract Genesix is ERC721, Ownable {
     function addApprover(address account) external onlyOwner beforeDeadline {
         if (isApprover[account]) revert AlreadyApprover(account);
         isApprover[account] = true;
-        emit ApproverAdded(account);
     }
 
     /// @notice Remove an existing approver
@@ -189,7 +186,6 @@ contract Genesix is ERC721, Ownable {
     function removeApprover(address account) external onlyOwner beforeDeadline {
         if (!isApprover[account]) revert NotApprover(account);
         isApprover[account] = false;
-        emit ApproverRemoved(account);
     }
 
     /*############################/*
