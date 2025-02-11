@@ -6,5 +6,13 @@
     "homepage": "https://efdn.notion.site/Using-Ethereum-Mainnet-18fd98955541805b806acaae49adadf4",
     "submissionType": "google_form",
     "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdUS_fRaPNgLBDsmDb95bjtNpmnNrlA7s3P_jP3caN1phcArw/viewform"
+  },
+  {
+    "id": 2,
+    "title": "⚡ Day 2: Using L2s",
+    "description": "Experience the speed and cost savings of Ethereum Layer 2 solutions!",
+    "homepage": "https://efdn.notion.site/Using-L2s-18fd989555418013b217f4856f31d171",
+    "submissionType": "google_form",
+    "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSebqN_pFQ-yqcH-ICI6XeBX__sfXJMY7UF6zqqWVT6bilef4g/viewform"
   }
 ]
