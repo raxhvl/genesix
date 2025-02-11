@@ -185,4 +185,39 @@ contract GenesixTest is Test {
         ));
         genesix.removeApprover(approver);
     }
+
+    function test_TokenURIIncludesChallengeId() public {
+        uint256[] memory points = new uint256[](3);
+        uint256 challengeId = 1;
+        _submitChallenge(challengeId, "sub-1", points, "player1");
+        
+        uint256 tokenId = 0; // First token
+        assertEq(genesix.getChallengeId(tokenId), challengeId);
+        assertEq(
+            genesix.tokenURI(tokenId),
+            string(abi.encodePacked(
+                "https://genesix.raxhvl.com/api/token",
+                "/",
+                "1", // challengeId
+                "/",
+                "0"  // tokenId
+            ))
+        );
+    }
+
+    function test_DifferentChallengesHaveDifferentURIs() public {
+        uint256[] memory points = new uint256[](3);
+        
+        // Submit two different challenges
+        _submitChallenge(1, "sub-1", points, "player1");
+        _submitChallenge(2, "sub-2", points, "player1");
+        
+        assertEq(genesix.getChallengeId(0), 1);
+        assertEq(genesix.getChallengeId(1), 2);
+        
+        assertTrue(
+            keccak256(bytes(genesix.tokenURI(0))) != 
+            keccak256(bytes(genesix.tokenURI(1)))
+        );
+    }
 }

@@ -23,6 +23,9 @@ contract Genesix is ERC721, Ownable {
     mapping(address => bool) public isApprover;
     uint256 public immutable deadline;
 
+    // Add mapping to track token metadata
+    mapping(uint256 tokenId => uint256 challengeId) private _tokenChallenge;
+
     struct Submission {
         uint256 challengeId;
         uint256[] points;
@@ -134,6 +137,7 @@ contract Genesix is ERC721, Ownable {
         });
 
         uint256 tokenId = _nextTokenId++;
+        _tokenChallenge[tokenId] = challengeId; // Store challenge ID for the token
         _safeMint(playerAddress, tokenId);
 
         emit SubmissionApproved(
@@ -194,6 +198,51 @@ contract Genesix is ERC721, Ownable {
     /// @notice Returns the base URI for computing token URIs
     /// @return The base URI string
     function _baseURI() internal pure override returns (string memory) {
-        return "http://TODO.com/token";
+        return "https://genesix.raxhvl.com/api/token";
+    }
+
+    /// @notice Returns token URI by combining base URI with challenge ID and token ID
+    /// @param tokenId The ID of the token
+    /// @return The token URI string
+    function tokenURI(uint256 tokenId) public view override returns (string memory) {
+        _requireOwned(tokenId);
+        uint256 challengeId = _tokenChallenge[tokenId];
+        return string(abi.encodePacked(
+            _baseURI(),
+            "/",
+            _toString(challengeId),
+            "/",
+            _toString(tokenId)
+        ));
+    }
+
+    /// @notice Get the challenge ID associated with a token
+    /// @param tokenId The ID of the token
+    /// @return The challenge ID
+    function getChallengeId(uint256 tokenId) public view returns (uint256) {
+        _requireOwned(tokenId);
+        return _tokenChallenge[tokenId];
+    }
+
+    /// @notice Convert uint256 to string
+    /// @param value The number to convert
+    /// @return The string representation
+    function _toString(uint256 value) internal pure returns (string memory) {
+        if (value == 0) {
+            return "0";
+        }
+        uint256 temp = value;
+        uint256 digits;
+        while (temp != 0) {
+            digits++;
+            temp /= 10;
+        }
+        bytes memory buffer = new bytes(digits);
+        while (value != 0) {
+            digits -= 1;
+            buffer[digits] = bytes1(uint8(48 + uint256(value % 10)));
+            value /= 10;
+        }
+        return string(buffer);
     }
 }
