@@ -23,12 +23,12 @@ export default function Header() {
             Challenges
           </Button>
         </Link>
-        <Link href="/review">
+        {/* <Link href="/review">
           <Button variant="ghost" className="flex items-center gap-2">
             <ScrollText className="h-4 w-4" />
             Review
           </Button>
-        </Link>
+        </Link> */}
         {/* <Link href="/settings">
           <Button variant="ghost" className="flex items-center gap-2">
             <Settings2 className="h-4 w-4" />
