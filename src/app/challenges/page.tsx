@@ -12,14 +12,32 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Trophy, Users, Play } from "lucide-react"; // Add Play icon
+import {
+  ExternalLink,
+  Trophy,
+  Users,
+  Play,
+  FileText,
+  Info,
+} from "lucide-react"; // Add FileText icon
 
 export default function Page() {
   const { challenges } = useAppContext();
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Available Challenges</h1>
+      <div className="mb-6">
+        <div className="flex items-center gap-4 mb-2">
+          <h1 className="text-3xl font-bold">Available Challenges</h1>
+          <a
+            href="https://efdn.notion.site/Onchain-Days-Homepage-177d989555418036a139d8bb1aebef6a"
+            target="_blank"
+            className="text-sm text-blue-500 hover:text-blue-600 flex items-center gap-1"
+          >
+            Read announcement post <ExternalLink size={14} />
+          </a>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {challenges.map((challenge) => {
@@ -80,14 +98,24 @@ export default function Page() {
 
               <CardContent className="flex-grow">
                 {challenge.homepage && (
-                  <a
-                    href={challenge.homepage}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-500 hover:text-blue-600 flex items-center gap-1"
-                  >
-                    Project Homepage <ExternalLink size={14} />
-                  </a>
+                  <div className="border border-slate-800 rounded-lg p-3">
+                    <a
+                      href={challenge.homepage}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 text-sm"
+                    >
+                      <div className="bg-blue-950 p-2 rounded-md">
+                        <Info className="w-4 h-4 text-blue-400" />
+                      </div>
+                      <div className="flex-grow">
+                        <div className="font-medium text-slate-200">
+                          Challenge Instructions
+                        </div>
+                      </div>
+                      <ExternalLink size={14} className="text-slate-500" />
+                    </a>
+                  </div>
                 )}
               </CardContent>
 
