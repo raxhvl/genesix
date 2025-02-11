@@ -1,9 +1,26 @@
 [
   {
+    "id": 1,
+    "title": "🌟 Day 1: Blockchain Basics",
+    "description": "Learn the fundamentals of blockchain technology",
+    "homepage": "https://forms.google.com/...",
+    "submissionType": "google_form",
+    "formUrl": "https://forms.google.com/challenge1"
+  },
+  {
+    "id": 2,
+    "title": "💡 Day 2: Smart Contracts",
+    "description": "Explore the world of smart contracts",
+    "homepage": "https://forms.google.com/...",
+    "submissionType": "google_form",
+    "formUrl": "https://forms.google.com/challenge2"
+  },
+  {
     "id": 3,
     "title": "🎮 Day 3: Gaming & NFTs",
     "description": " Let's have some fun on chain!",
     "homepage": "https://www.notion.so/efdn/Gaming-NFTs-18fd9895554180cd88b1d06404a5d669",
+    "submissionType": "onchain",
     "tasks": [
       {
         "id": 1,

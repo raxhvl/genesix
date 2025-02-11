@@ -21,13 +21,13 @@
 ├── 📁 contracts/             # Foundry project directory
 │   ├── 📄 foundry.toml       # Foundry configuration file
 │   ├── 📁 src/               # Solidity contracts
-│   │   ├── 📄 MyContract.sol
+│   │   ├── 📄 Genesix.sol
 │   │   └── 📄 ...
 │   ├── 📁 script/            # Deployment and interaction scripts
 │   │   ├── 📄 Deploy.s.sol
 │   │   └── 📄 ...
 │   ├── 📁 test/              # Solidity tests
-│   │   ├── 📄 MyContract.t.sol
+│   │   ├── 📄 Genesix.t.sol
 │   │   └── 📄 ...
 │   ├── 📁 lib/               # External libraries
 │   ├── 📁 out/               # Compiled contract artifacts (ignored in git)
@@ -78,6 +78,8 @@ forge test
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## ⚠️ Disclaimer
+
+This was mostly built on a weekend, and I'm no [Ken Thompson.](https://www.linfo.org/thompson.html)
 
 This software is experimental and provided "as is" without warranty of any kind. The software may contain bugs, errors, or security vulnerabilities.
 

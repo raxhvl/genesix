@@ -37,7 +37,9 @@ interface Challenge {
   title: string;
   description: string;
   homepage: string;
-  tasks: Task[];
+  submissionType?: "google_form" | "onchain";
+  formUrl?: string;
+  tasks?: Task[];
 }
 
 interface AppContextType {
