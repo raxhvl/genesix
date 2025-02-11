@@ -28,8 +28,9 @@ export interface Task {
   difficulty: ChallengeDifficulty;
   points: number;
   proofType: ProofType;
-  allowMultipleProofs: boolean;
+  allowMultipleProofs?: boolean;
   playersRequired: number;
+  required?: boolean;
 }
 
 interface Challenge {
@@ -61,6 +62,7 @@ export interface Submission {
   playerAddress: Address;
   challengeId: number;
   responses: Response[];
+  timestamp: number;
 }
 
 export interface Response {

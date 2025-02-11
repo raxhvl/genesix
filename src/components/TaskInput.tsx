@@ -107,9 +107,15 @@ export default function TaskInput({
 
   return (
     <div className="space-y-4 w-full">
-      <Label className="text-muted-foreground" htmlFor={inputId}>
-        {task.description}
-      </Label>
+      <div className="flex items-center gap-2">
+        <Label className="text-muted-foreground" htmlFor={inputId}>
+          {task.description}
+        </Label>
+        {task.required && (
+          <span className="text-xs text-red-500 font-medium">Required</span>
+        )}
+      </div>
+
       {task.proofType === ProofType.LINK && (
         <Input
           type="url"
@@ -120,7 +126,12 @@ export default function TaskInput({
             setProof(e.target.value);
             onProofChange(e.target.value);
           }}
-          className="bg-background text-foreground"
+          className={`bg-background text-foreground ${
+            task.required
+              ? "border-red-500/50 focus-visible:ring-red-500/20"
+              : ""
+          }`}
+          required={task.required}
         />
       )}
       {task.proofType === ProofType.TEXT && (
@@ -132,7 +143,12 @@ export default function TaskInput({
             setProof(e.target.value);
             onProofChange(e.target.value);
           }}
-          className="bg-background text-foreground"
+          className={`bg-background text-foreground ${
+            task.required
+              ? "border-red-500/50 focus-visible:ring-red-500/20"
+              : ""
+          }`}
+          required={task.required}
         />
       )}
       {task.proofType === ProofType.IMAGE && (
@@ -147,8 +163,13 @@ export default function TaskInput({
                 handleImageUpload(files);
               }
             }}
-            className="bg-background text-foreground"
+            className={`bg-background text-foreground ${
+              task.required
+                ? "border-red-500/50 focus-visible:ring-red-500/20"
+                : ""
+            }`}
             disabled={uploading || images.length >= maxFiles}
+            required={task.required && images.length === 0}
           />
           {uploading && (
             <div className="space-y-2">

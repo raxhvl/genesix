@@ -110,7 +110,7 @@ export default function Page() {
                       </div>
                       <div className="flex-grow">
                         <div className="font-medium text-slate-200">
-                          Challenge Instructions
+                          Challenge overview
                         </div>
                       </div>
                       <ExternalLink size={14} className="text-slate-500" />

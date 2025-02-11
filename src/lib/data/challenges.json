@@ -22,5 +22,186 @@
     "homepage": "https://efdn.notion.site/Gaming-NFTs-18fd9895554180cd88b1d06404a5d669",
     "submissionType": "google_form",
     "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeCaPXdyfMqVrbLdeMpmRBkZpgUbLDM41UBpFHN7AeJlXLXqw/viewform"
+  },
+  {
+    "id": 4,
+    "title": "🎮 Day 4: Gaming & NFTs",
+    "description": " Let's have some fun on chain!",
+    "homepage": "https://www.notion.so/efdn/Gaming-NFTs-18fd9895554180cd88b1d06404a5d669",
+    "submissionType": "onchain",
+    "tasks": [
+      {
+        "id": 1,
+        "title": "Members of the group",
+        "description": "Write the names/aliases of the EFers you worked with for these challenges!",
+        "instructions_url": "https://www.notion.so/efdn/Gaming-NFTs-18fd9895554180cd88b1d06404a5d669",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0,
+        "proofType": "text",
+        "required": true
+      },
+      {
+        "id": 2,
+        "title": "Challenge 1: Offchain governance on Discourse",
+        "description": "Share a link of your contribution and a brief comment on your experience.",
+        "proofType": "text",
+        "instructions_url": "https://www.notion.so/efdn/Challenge-1-Start-your-onchain-journey-with-offchain-governance-18fd98955541819ab472f4f6983b2b14",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 10
+      },
+      {
+        "id": 3,
+        "title": "[Optional] Challenge 1: Offchain governance on Discourse",
+        "description": " Include screenshots of your contribution.",
+        "proofType": "image",
+        "instructions_url": "https://www.notion.so/efdn/Challenge-1-Start-your-onchain-journey-with-offchain-governance-18fd98955541819ab472f4f6983b2b14",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0
+      },
+      {
+        "id": 4,
+        "title": "Challenge 2: (Re-)Delegate your DAO tokens",
+        "description": "Share a link of your contribution and a brief comment on your experience.",
+        "proofType": "text",
+        "instructions_url": "https://www.notion.so/efdn/Challenge-2-Re-Delegate-your-DAO-tokens-191d98955541800bb86ffeffe9f52889",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 15
+      },
+      {
+        "id": 5,
+        "title": "[Optional] Challenge 2: (Re-)Delegate your DAO tokens",
+        "description": "Include screenshots of your contribution.",
+        "proofType": "image",
+        "instructions_url": "https://www.notion.so/efdn/Challenge-2-Re-Delegate-your-DAO-tokens-191d98955541800bb86ffeffe9f52889",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0
+      },
+      {
+        "id": 6,
+        "title": "Challenge 3a: Create a Snapshot space",
+        "description": "Share a link to the Snapshot space you created and a brief comment on your thought process when choosing this particular voting strategy.",
+        "proofType": "text",
+        "instructions_url": "https://www.notion.so/efdn/3a-Create-a-Snapshot-space-18fd9895554181b9a622d2c77dd6b262",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 10
+      },
+      {
+        "id": 7,
+        "title": "[Bonus] Challenge 3a: Create a Snapshot space",
+        "description": "Share a link to the Snapshot space you created and a brief comment on your thought process when choosing this particular voting strategy.",
+        "proofType": "text",
+        "instructions_url": "https://www.notion.so/efdn/3a-Create-a-Snapshot-space-18fd9895554181b9a622d2c77dd6b262",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 10
+      },
+      {
+        "id": 8,
+        "title": "Challenge 3b: Explore a DAO suite",
+        "description": "Post a link to each of your newly created DAOs.",
+        "proofType": "text",
+        "instructions_url": "https://www.notion.so/efdn/3b-Explore-a-DAO-suite-18fd9895554181c9a7d8c61581dbe34e",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 15
+      },
+      {
+        "id": 9,
+        "title": "[Optional] Challenge 3b: Explore a DAO suite",
+        "description": "Share a brief comment about your experience.",
+        "proofType": "text",
+        "instructions_url": "https://www.notion.so/efdn/3b-Explore-a-DAO-suite-18fd9895554181c9a7d8c61581dbe34e",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0
+      },
+      {
+        "id": 10,
+        "title": "Challenge 3c: Summon a Moloch DAO",
+        "description": "Share a link of your contribution and a brief comment on your experience.",
+        "proofType": "text",
+        "instructions_url": "https://www.notion.so/efdn/3c-Summon-a-Moloch-DAO-191d989555418067a5b1c38b8ce6db1a",
+        "playersRequired": 1,
+        "difficulty": "medium",
+        "points": 20
+      },
+      {
+        "id": 11,
+        "title": "[Optional] Challenge 3c: Summon a Moloch DAO",
+        "description": "Include screenshots of your contribution.",
+        "proofType": "image",
+        "instructions_url": "https://www.notion.so/efdn/3c-Summon-a-Moloch-DAO-191d989555418067a5b1c38b8ce6db1a",
+        "playersRequired": 1,
+        "difficulty": "medium",
+        "points": 0
+      },
+      {
+        "id": 12,
+        "title": "[Optional / Bragging Rights] Challenge 3d: Deploy a Governor contract",
+        "description": "Share a link of your contribution and a brief comment on your experience.",
+        "proofType": "text",
+        "instructions_url": "https://www.notion.so/efdn/3d-OPTIONAL-Deploy-a-Governor-contract-191d98955541805e8036ec55fd8cd624",
+        "playersRequired": 1,
+        "difficulty": "hard",
+        "points": 0
+      },
+      {
+        "id": 13,
+        "title": "[Optional / Bragging Rights] Challenge 3d: Deploy a Governor contract",
+        "description": "Include screenshots of your contribution.",
+        "proofType": "image",
+        "instructions_url": "https://www.notion.so/efdn/3d-OPTIONAL-Deploy-a-Governor-contract-191d98955541805e8036ec55fd8cd624",
+        "playersRequired": 1,
+        "difficulty": "hard",
+        "points": 0
+      },
+      {
+        "id": 14,
+        "title": "Challenge 4: DAOs, DINOs and everything in between",
+        "description": "Share your responses to a) and b).",
+        "proofType": "text",
+        "instructions_url": "https://www.notion.so/efdn/Challenge-4-DAOs-DINOs-and-everything-in-between-18fd9895554181259848e4d5a51ec331",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 10
+      },
+      {
+        "id": 15,
+        "title": "Challenge 5: Upgrade your DAO to multiplayer",
+        "description": "Share a link of your contribution and a brief comment on your experience. Mention unique identifiers of all other participants to confirm they are part of your DAO.",
+        "proofType": "text",
+        "instructions_url": "https://www.notion.so/efdn/Challenge-5-Upgrade-your-DAO-to-multiplayer-18fd989555418140bdcdc1de9cc75943",
+        "playersRequired": 3,
+        "difficulty": "easy",
+        "points": 25
+      },
+
+      {
+        "id": 16,
+        "title": "[Optional] Challenge 5: Upgrade your DAO to multiplayer",
+        "description": "Include screenshots.",
+        "proofType": "image",
+        "instructions_url": "https://www.notion.so/efdn/Challenge-5-Upgrade-your-DAO-to-multiplayer-18fd989555418140bdcdc1de9cc75943",
+        "playersRequired": 3,
+        "difficulty": "easy",
+        "points": 0
+      },
+      {
+        "id": 17,
+        "title": "[Optional] Help improve the state of DAOs",
+        "description": "Are you interested further discussing the state of DAOs? We'll keep a list and might get back to you for further events or projects.",
+        "proofType": "text",
+        "instructions_url": "https://www.notion.so/efdn/DAOs-18fd989555418057ba3efc843f9bbaef",
+        "playersRequired": 1,
+        "difficulty": "medium",
+        "points": 0
+      }
+    ]
   }
 ]

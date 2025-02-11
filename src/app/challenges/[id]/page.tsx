@@ -23,7 +23,14 @@ import ReactConfetti from "react-confetti";
 import { useRouter } from "next/navigation";
 import { useWeb3Context } from "@/lib/context/Web3Context";
 import { useToast } from "@/hooks/use-toast";
-import { Copy, HelpCircle, ShieldAlert, User } from "lucide-react";
+import {
+  Copy,
+  ExternalLink,
+  HelpCircle,
+  Info,
+  ShieldAlert,
+  User,
+} from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -42,15 +49,20 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
   const challenge = challenges.find((c) => c.id === challengeId);
 
-  // Initialize submission state
+  if (!challenge) {
+    return <div>Challenge not found!</div>;
+  }
+
+  // Initialize submission state with timestamp
   const [submission, setSubmission] = useState<Submission>({
     version: SubmissionPayloadVersion.V1,
     chainId,
-    nickname: "", // TODO: Get from wallet
+    nickname: "", // TODO: Query nickname from the contract.
     playerAddress,
     challengeId,
+    timestamp: Math.floor(Date.now() / 1000),
     responses:
-      challenge?.tasks.map((task) => ({
+      challenge?.tasks?.map((task) => ({
         taskId: task.id,
         type: task.proofType,
         answer: "",
@@ -69,7 +81,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }
 
   function handleProofChange(taskId: number, proof: string | string[]) {
-    const task = challenge?.tasks.find((task) => task.id === taskId);
+    const task = challenge?.tasks?.find((task) => task.id === taskId);
     if (!task) {
       throw new Error("Task not found");
     }
@@ -161,7 +173,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }
 
   async function handleConfirmSubmission() {
-    if (chainId != 1) {
+    if (chainId != 1 && false) {
       toast({
         title: "Wrong Chain Selected",
         description: "Please switch to Ethereum mainnet to submit.",
@@ -171,7 +183,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     }
     try {
       setIsUploading(true);
-      const submissionId = await uploadSubmission(submission);
+      // Update timestamp right before submission
+      const submissionWithCurrentTime = {
+        ...submission,
+        timestamp: Math.floor(Date.now() / 1000),
+      };
+      const submissionId = await uploadSubmission(submissionWithCurrentTime);
       setShowConfirmDialog(false);
       setSubmissionId(submissionId);
       setShowSuccessDialog(true);
@@ -219,16 +236,27 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       <div className="space-y-8 w-xl">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold">{challenge.title}</h1>
-          <p className="text-muted-foreground">
-            {challenge.description}.{" "}
-            <a
-              href={challenge.homepage}
-              target="_blank"
-              className="text-blue-500 text-sm hover:underline"
-            >
-              View challenge homepage 🔗.
-            </a>
-          </p>
+          <p className="text-muted-foreground">{challenge.description}</p>
+          {challenge.homepage && (
+            <div className="border border-slate-800 rounded-lg p-3">
+              <a
+                href={challenge.homepage}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 text-sm"
+              >
+                <div className="bg-blue-950 p-2 rounded-md">
+                  <Info className="w-4 h-4 text-blue-400" />
+                </div>
+                <div className="flex-grow">
+                  <div className="font-medium text-slate-200">
+                    Challenge overview
+                  </div>
+                </div>
+                <ExternalLink size={14} className="text-slate-500" />
+              </a>
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-8">
@@ -246,7 +274,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           </div>
 
           <div className="space-y-6 ">
-            {challenge.tasks.map((task, index) => (
+            {challenge.tasks?.map((task, index) => (
               <div
                 key={task.id}
                 className="bg-card p-6 rounded-lg border space-y-4"
@@ -290,76 +318,80 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
 
       {/* Confirmation Dialog */}
       <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
-        <DialogContent>
-          <DialogHeader className="space-y-3">
-            <DialogTitle className="text-2xl">
-              Confirm Your Submission
-            </DialogTitle>
-            <Alert>
-              <ShieldAlert />
-              <AlertTitle>Review your submission!</AlertTitle>
-              <AlertDescription>
-                Redact any sensitive information before submitting. We’re not
-                looking to break any scandals in the morning news here! 😉
-              </AlertDescription>
-            </Alert>
-          </DialogHeader>
-          <div className="space-y-2 my-4">
-            <div className="bg-muted p-4 rounded-lg">
-              <h4 className="font-semibold text-lg mb-4">Submission Details</h4>
-              <div className="space-y-4">
-                <div className="border-b">
-                  <h5 className="font-bold text-base mb-1">Nickname</h5>
-                  <p className="text-sm text-muted-foreground">
-                    👤 {submission.nickname}
-                  </p>
-                </div>
-                {submission.responses.map((response) => {
-                  const task = challenge.tasks.find(
-                    (t) => t.id === response.taskId
-                  );
-                  if (!task) return null;
+        <DialogContent className="max-h-[90vh] flex flex-col gap-0 p-0">
+          <div className="p-6 overflow-y-auto">
+            <DialogHeader className="space-y-3">
+              <DialogTitle className="text-2xl">
+                Confirm Your Submission
+              </DialogTitle>
+              <Alert>
+                <ShieldAlert />
+                <AlertTitle>Review your submission!</AlertTitle>
+                <AlertDescription>
+                  Redact any sensitive information before submitting. We’re not
+                  looking to break any scandals in the morning news here! 😉
+                </AlertDescription>
+              </Alert>
+            </DialogHeader>
+            <div className="space-y-2 my-4">
+              <div className="bg-muted p-4 rounded-lg">
+                <h4 className="font-semibold text-lg mb-4">
+                  Submission Details
+                </h4>
+                <div className="space-y-4">
+                  <div className="border-b">
+                    <h5 className="font-bold text-base mb-1">Nickname</h5>
+                    <p className="text-sm text-muted-foreground">
+                      👤 {submission.nickname}
+                    </p>
+                  </div>
+                  {submission.responses.map((response) => {
+                    const task = challenge.tasks?.find(
+                      (t) => t.id === response.taskId
+                    );
+                    if (!task) return null;
 
-                  return (
-                    <div key={response.taskId} className="space-y-1.5">
-                      <h5 className="font-bold text-base">{task.title}</h5>
-                      <div className="text-sm text-muted-foreground">
-                        {response.images.length > 0 ? (
-                          <div className="flex items-center gap-2">
-                            <span>📸</span>
-                            <span>
-                              {response.images.length} image(s) uploaded
-                            </span>
-                          </div>
-                        ) : task.proofType === ProofType.LINK ? (
-                          response.answer ? (
-                            <a
-                              href={response.answer}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-500 hover:underline inline-flex items-center gap-2"
-                            >
-                              <span>🔗 {response.answer}</span>
-                            </a>
+                    return (
+                      <div key={response.taskId} className="space-y-1.5">
+                        <h5 className="font-bold text-base">{task.title}</h5>
+                        <div className="text-sm text-muted-foreground">
+                          {response.images.length > 0 ? (
+                            <div className="flex items-center gap-2">
+                              <span>📸</span>
+                              <span>
+                                {response.images.length} image(s) uploaded
+                              </span>
+                            </div>
+                          ) : task.proofType === ProofType.LINK ? (
+                            response.answer ? (
+                              <a
+                                href={response.answer}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline inline-flex items-center gap-2"
+                              >
+                                <span>🔗 {response.answer}</span>
+                              </a>
+                            ) : (
+                              "🔗 No answer provided"
+                            )
                           ) : (
-                            "🔗 No answer provided"
-                          )
-                        ) : (
-                          <div className="flex items-start gap-2">
-                            <span>📝</span>
-                            <span>
-                              {response.answer || "No answer provided"}
-                            </span>
-                          </div>
-                        )}
+                            <div className="flex items-start gap-2">
+                              <span>📝</span>
+                              <span>
+                                {response.answer || "No answer provided"}
+                              </span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
-          <DialogFooter className="gap-3 sm:gap-0">
+          <DialogFooter className="p-6 border-t">
             <Button
               variant="outline"
               onClick={() => setShowConfirmDialog(false)}
