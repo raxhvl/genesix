@@ -94,8 +94,8 @@
       {
         "id": 7,
         "title": "[Bonus] Challenge 3a: Create a Snapshot space",
-        "description": "Share a link to the Snapshot space you created and a brief comment on your thought process when choosing this particular voting strategy.",
-        "proofType": "text",
+        "description": "Share a screenshot attesting your onchain execution (e.g., the SafeSnap plugin setup finalized).",
+        "proofType": "image",
         "instructions_url": "https://www.notion.so/efdn/3a-Create-a-Snapshot-space-18fd9895554181b9a622d2c77dd6b262",
         "playersRequired": 1,
         "difficulty": "easy",
