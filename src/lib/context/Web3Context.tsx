@@ -24,7 +24,8 @@ interface Web3ContextType {
   isConnected: boolean;
   isReviewer: boolean;
   isBetaTester: boolean;
-  isOwner: boolean; // Add this line
+  isOwner: boolean;
+  deadline: number; // Add this line
 }
 
 const Web3Context = createContext<Web3ContextType | null>(null);
@@ -50,6 +51,13 @@ export function Web3Provider({ children }: { children: ReactNode }) {
     abi,
     functionName: "isApprover",
     args: [address as Address],
+  });
+
+  // Add deadline read
+  const { data: deadline } = useReadContract({
+    address: contractAddress,
+    abi,
+    functionName: "deadline",
   });
 
   // Check both static list and contract for reviewer status
@@ -85,6 +93,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         isReviewer,
         isBetaTester,
         isOwner,
+        deadline: deadline ? Number(deadline) : 0,
       }}
     >
       {children}

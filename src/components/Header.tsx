@@ -1,16 +1,15 @@
 "use client";
 
-import { SUBMISSION_DEADLINE } from "@/lib/config";
 import { isRootPage } from "@/lib/ui";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Blocks, ScrollText, Settings } from "lucide-react"; // Add Settings import
+import { Blocks, ScrollText, Settings } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useWeb3Context } from "@/lib/context/Web3Context";
 import { CountdownTimer } from "./CountdownTimer";
 
 export default function Header() {
-  const { isReviewer, isOwner } = useWeb3Context();
+  const { isReviewer, isOwner, deadline } = useWeb3Context();
 
   if (isRootPage()) return null;
   return (
@@ -47,7 +46,7 @@ export default function Header() {
           )}
         </div>
         <div className="mx-auto">
-          <CountdownTimer deadline={SUBMISSION_DEADLINE} />
+          <CountdownTimer deadline={deadline} />
         </div>
         <div className="ml-auto">
           <ConnectButton />

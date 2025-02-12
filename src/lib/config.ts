@@ -44,8 +44,6 @@ export const imageConfig = {
   acceptedTypes: ["image/jpeg", "image/png", "image/gif", "image/webp"],
 };
 
-export const SUBMISSION_DEADLINE = 1739491200;
-
 // TODO: Remove static reviewers
 export const reviewerAddresses: Address[] = [
   "0x5a9d681201fedb563B29D3099628c2c6fA1BBDD8",
@@ -54,6 +52,7 @@ export const reviewerAddresses: Address[] = [
 
 export const betaTesters: Address[] = [
   "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", // Allows submissions on testnets
+  "0x5a9d681201fedb563B29D3099628c2c6fA1BBDD8",
 ];
 
 export const openseaConfig = {
