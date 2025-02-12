@@ -12,6 +12,17 @@ import { fetchSubmission } from "@/lib/fs";
 import { useWriteContract } from "wagmi";
 import { abi, getContractAddress } from "@/lib/config";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Address } from "viem";
+import { Label } from "@/components/ui/label";
+import { Info } from "lucide-react";
 
 export default function Page() {
   const { challenges } = useAppContext();
@@ -21,6 +32,7 @@ export default function Page() {
   const [loading, setLoading] = useState(false);
   const [approvedTaskIds, setApprovedTaskIds] = useState<number[]>([]);
   const { toast } = useToast();
+  const [showApprovalDialog, setShowApprovalDialog] = useState(false);
 
   const {
     writeContract,
@@ -68,6 +80,18 @@ export default function Page() {
   }
 
   function submitApproval() {
+    setShowApprovalDialog(true);
+  }
+
+  function handleAddressChange(newAddress: string) {
+    if (!submission) return;
+    setSubmission({
+      ...submission,
+      playerAddress: newAddress as Address,
+    });
+  }
+
+  function handleFinalApproval() {
     if (!submission || !challenge) return;
 
     writeContract({
@@ -84,6 +108,7 @@ export default function Page() {
         ),
       ],
     });
+    setShowApprovalDialog(false);
   }
 
   // Watch for transaction status
@@ -127,6 +152,12 @@ export default function Page() {
     });
   };
 
+  function handleSubmissionSearch(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Enter" && submissionId && !loading) {
+      fetchSubmissionData(submissionId);
+    }
+  }
+
   return (
     <div className="container max-w-3xl mx-auto p-4 space-y-4">
       <div>
@@ -134,6 +165,7 @@ export default function Page() {
           <Input
             value={submissionId}
             onChange={(e) => setSubmissionId(e.target.value)}
+            onKeyUp={handleSubmissionSearch}
             placeholder="Enter submission ID"
           />
           <Button
@@ -228,6 +260,80 @@ export default function Page() {
           </CardContent>
         </Card>
       )}
+
+      {/* Add Approval Confirmation Dialog */}
+      <Dialog open={showApprovalDialog} onOpenChange={setShowApprovalDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Submission Approval</DialogTitle>
+            <DialogDescription>
+              Please review the submission details and recipient address
+              carefully.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            <div className="bg-muted/50 p-4 rounded-lg space-y-3">
+              <h4 className="font-semibold text-lg">📝 Submission Details</h4>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <span className="font-medium">🏆 Challenge:</span>
+                  <span className="text-muted-foreground">
+                    {challenge?.title}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-medium">⭐ Score:</span>
+                  <span className="text-muted-foreground">
+                    {approvedPoints} / {totalPoints} points
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-medium">👤 Player:</span>
+                  <span className="text-muted-foreground">
+                    {submission?.nickname}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label
+                htmlFor="reward-address"
+                className="text-base font-semibold"
+              >
+                💰 Recipient Address
+              </Label>
+              <Input
+                id="reward-address"
+                value={submission?.playerAddress ?? ""}
+                onChange={(e) => handleAddressChange(e.target.value)}
+                required
+              />
+              <div className="flex gap-2 items-start mt-2">
+                <Info className="h-4 w-4 mt-0.5 text-muted-foreground shrink-0" />
+                <p className="text-sm text-muted-foreground">
+                  This address will receive both the points and NFT. For group
+                  submissions, you can reuse the same submission ID to approve
+                  multiple recipients.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowApprovalDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleFinalApproval} disabled={isPending}>
+              {isPending ? "Confirming..." : "Confirm Approval"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
