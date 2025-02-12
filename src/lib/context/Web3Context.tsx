@@ -6,13 +6,14 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { Address } from "viem";
 import Home from "@/app/page";
-import { reviewerAddresses } from "@/lib/config";
+import { reviewerAddresses, betaTesters } from "@/lib/config";
 
 interface Web3ContextType {
   chainId: number;
   playerAddress: Address;
   isConnected: boolean;
   isReviewer: boolean;
+  isBetaTester: boolean;
 }
 
 const Web3Context = createContext<Web3ContextType | null>(null);
@@ -22,6 +23,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   const isReviewer = address ? reviewerAddresses.includes(address) : false;
+  const isBetaTester = address ? betaTesters.includes(address) : false;
 
   useEffect(() => {
     if (!isConnected) {
@@ -40,6 +42,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         playerAddress: address,
         isConnected,
         isReviewer,
+        isBetaTester,
       }}
     >
       {children}

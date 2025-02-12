@@ -37,7 +37,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { challenges } = useAppContext();
-  const { playerAddress, chainId } = useWeb3Context();
+  const { playerAddress, chainId, isBetaTester } = useWeb3Context();
   const router = useRouter();
   const { toast } = useToast(); // Add this at the top with other hooks
 
@@ -173,7 +173,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   }
 
   async function handleConfirmSubmission() {
-    if (chainId != 1) {
+    if (!isBetaTester && chainId != 1) {
       toast({
         title: "Wrong Chain Selected",
         description: "Please switch to Ethereum mainnet to submit.",
