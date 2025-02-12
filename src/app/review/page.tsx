@@ -22,8 +22,13 @@ export default function Page() {
   const [approvedTaskIds, setApprovedTaskIds] = useState<number[]>([]);
   const { toast } = useToast();
 
-  const { writeContract, isSuccess, isPending, isError, error } =
-    useWriteContract();
+  const {
+    writeContract,
+    isSuccess,
+    isPending,
+    isError,
+    error: contractError,
+  } = useWriteContract();
 
   // Find challenge and calculate points
   const challenge = submission
@@ -44,11 +49,12 @@ export default function Page() {
       setSubmission(data);
       setApprovedTaskIds([]); // Reset approvals for new submission
     } catch (error) {
-      console.error("Error fetching submission:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       toast({
         variant: "destructive",
-        title: "Error",
-        description: "Failed to fetch submission data. Please try again.",
+        title: "Whoops! Cannot fetch submission",
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -91,14 +97,14 @@ export default function Page() {
       setSubmission(null);
       setSubmissionId("");
       setApprovedTaskIds([]);
-    } else if (isError && error) {
+    } else if (isError && contractError) {
       toast({
         variant: "destructive",
         title: "Transaction failed",
-        description: error.message,
+        description: contractError.message,
       });
     }
-  }, [isSuccess, isError, error, toast]);
+  }, [isSuccess, isError, contractError, toast]);
 
   // Add this helper function at the top of the component
   const renderTextWithLinks = (text: string) => {

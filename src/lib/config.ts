@@ -46,6 +46,7 @@ export const imageConfig = {
 
 export const SUBMISSION_DEADLINE = 1739491200;
 
+// TODO: Remove static reviewers
 export const reviewerAddresses: Address[] = [
   "0x5a9d681201fedb563B29D3099628c2c6fA1BBDD8",
   "0xbb3EAa87E8057f84fD47C16D59dFBD20Ab9B5b2f",

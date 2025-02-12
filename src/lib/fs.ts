@@ -34,7 +34,8 @@ export async function fetchSubmission(
 ): Promise<Submission> {
   const response = await fetch(`/api/submissions/${chainId}/${submissionId}`);
   if (!response.ok) {
-    throw new Error(`Failed to fetch submission: ${response.statusText}`);
+    const res = await response.json();
+    throw new Error(`${res.error}`);
   }
   return response.json();
 }

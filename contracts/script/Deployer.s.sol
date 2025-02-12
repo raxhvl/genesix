@@ -9,10 +9,10 @@ import {Genesix} from "../src/Genesix.sol";
 contract Launch is Script {
     Genesix public genesix;
 
-    // Deployment TODO:
-    // 1. Replace owner address
 
     address owner =  address(this);
+    // Deployment TODO:
+    // 1. Replace owner address
     address wallet = address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
 
     function setUp() public {}
@@ -21,6 +21,7 @@ contract Launch is Script {
         vm.startBroadcast();
 
         genesix = new Genesix(wallet);
+        // TODO: Remove automatic addition of owner as approver
         genesix.addApprover(wallet);
 
         vm.stopBroadcast();

@@ -1,12 +1,22 @@
 "use client";
 
-import { createContext, useContext, ReactNode } from "react";
-import { useAccount } from "wagmi";
+import {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
+import { useAccount, useReadContract } from "wagmi";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Address } from "viem";
 import Home from "@/app/page";
-import { reviewerAddresses, betaTesters } from "@/lib/config";
+import {
+  reviewerAddresses,
+  betaTesters,
+  abi,
+  getContractAddress,
+} from "@/lib/config";
 
 interface Web3ContextType {
   chainId: number;
@@ -21,8 +31,28 @@ const Web3Context = createContext<Web3ContextType | null>(null);
 export function Web3Provider({ children }: { children: ReactNode }) {
   const { address, chainId, isConnected } = useAccount();
   const router = useRouter();
+  const [isReviewer, setIsReviewer] = useState(false);
 
-  const isReviewer = address ? reviewerAddresses.includes(address) : false;
+  // Query contract for reviewer status
+  const { data: isContractReviewer } = useReadContract({
+    address: chainId ? getContractAddress(chainId) : undefined,
+    abi,
+    functionName: "isApprover",
+    args: [address as Address],
+  });
+
+  // Check both static list and contract for reviewer status
+  useEffect(() => {
+    if (address) {
+      setIsReviewer(
+        // TODO: Remove static reviewers
+        reviewerAddresses.includes(address) || !!isContractReviewer
+      );
+    } else {
+      setIsReviewer(false);
+    }
+  }, [address, isContractReviewer]);
+
   const isBetaTester = address ? betaTesters.includes(address) : false;
 
   useEffect(() => {

@@ -18,7 +18,10 @@ export async function GET(request: Request, props: Props) {
 
     const response = await fetch(url);
     if (!response.ok) {
-      throw new Error("Submission not found");
+      return NextResponse.json(
+        { error: "Submission not found! Are you on the correct chain?" },
+        { status: 404 }
+      );
     }
 
     const submission = await response.json();
