@@ -203,5 +203,214 @@
         "points": 0
       }
     ]
+  },
+  {
+    "id": 5,
+    "title": "🤝 Day 5: Social",
+    "description": "Connect with the Ethereum community through decentralized social platforms and public goods!",
+    "homepage": "https://www.notion.so/efdn/Social-18fd9895554180ce8b10ff2651acfafe",
+    "submissionType": "onchain",
+    "tasks": [
+      {
+        "id": 1,
+        "title": "👤 Set up a social account",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 10,
+        "instructions_url": "https://www.notion.so/efdn/Set-up-a-social-account-18fd98955541811d8599ebbb7d939974",
+        "description": "Set up and share a screenshot of your new social account. Redact your username if you don’t want us to follow you :).",
+        "proofType": "image"
+      },
+      {
+        "id": 2,
+        "title": "💭 [Optional Feedback] Set up a social account",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Set-up-a-social-account-18fd98955541811d8599ebbb7d939974",
+        "description": "Tell us about your first impressions of web3 social platforms!",
+        "proofType": "text"
+      },
+      {
+        "id": 3,
+        "title": "🎲 Place a bet on Polymarket",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 10,
+        "instructions_url": "https://www.notion.so/efdn/Place-a-bet-on-polymarket-18fd9895554181beb81aecab67b0263d",
+        "description": "Make a prediction on Polymarket and share a screenshot of your market position.",
+        "proofType": "image"
+      },
+      {
+        "id": 4,
+        "title": "💭 [Optional Feedback] Place a bet on Polymarket",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Place-a-bet-on-polymarket-18fd9895554181beb81aecab67b0263d",
+        "description": "Tell us about your prediction market experience or any challenges you faced.",
+        "proofType": "text"
+      },
+      {
+        "id": 5,
+        "title": "🖼️ Make an onchain tx from a Farcaster frame",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 20,
+        "instructions_url": "https://www.notion.so/efdn/Make-an-onchain-tx-from-a-farcaster-frame-18fd989555418135b599f1d4d37382c9",
+        "description": "Complete a transaction through a Farcaster frame and share the Etherscan link.",
+        "proofType": "link"
+      },
+      {
+        "id": 6,
+        "title": "💭 [Optional Feedback] Share your experience using Farcaster",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Make-an-onchain-tx-from-a-farcaster-frame-18fd989555418135b599f1d4d37382c9",
+        "description": "What did you think about the Farcaster experience? Share your thoughts!",
+        "proofType": "text"
+      },
+      {
+        "id": 7,
+        "title": "🧬 Join a token gated DeSci chat",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 20,
+        "instructions_url": "https://www.notion.so/efdn/Join-a-token-gated-DeSci-chat-18fd9895554181d1bb16f7b5a507e2ed",
+        "description": "Join a DeSci community and share a screenshot of the members-only chat area.",
+        "proofType": "image"
+      },
+      {
+        "id": 8,
+        "title": "💭 [Optional Feedback] Join a token gated DeSci chat",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Join-a-token-gated-DeSci-chat-18fd9895554181d1bb16f7b5a507e2ed",
+        "description": "What was your experience like joining a DeSci community? Tell us about it!",
+        "proofType": "text"
+      },
+      {
+        "id": 9,
+        "title": "🎁 Donate to a project in Gitcoin or Giveth",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 20,
+        "instructions_url": "https://www.notion.so/efdn/Donate-to-a-project-in-Gitcoin-or-Giveth-18fd9895554181278504d4e6bc7a46a8",
+        "description": "Support a public good by making a donation and share the transaction link.",
+        "proofType": "link"
+      },
+      {
+        "id": 10,
+        "title": "💭 [Optional Feedback] Donate to a project in Gitcoin or Giveth",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Donate-to-a-project-in-Gitcoin-or-Giveth-18fd9895554181278504d4e6bc7a46a8",
+        "description": "How was your experience contributing to public goods? Share your thoughts!",
+        "proofType": "text"
+      },
+      {
+        "id": 11,
+        "title": "📧 Recover an account using ZK Email",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 20,
+        "instructions_url": "https://www.notion.so/efdn/Recover-an-account-using-zkemail-18fd9895554181a9bfdcfe08088c5f20",
+        "description": "Complete an account recovery using ZK Email and share proof of the process.",
+        "proofType": "image"
+      },
+      {
+        "id": 12,
+        "title": "💭 [Optional Feedback] Recover an account using ZK Email",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Recover-an-account-using-zkemail-18fd9895554181a9bfdcfe08088c5f20",
+        "description": "How was your experience with ZK Email recovery? Let us know!",
+        "proofType": "text"
+      },
+      {
+        "id": 13,
+        "title": "📝 Register an ENS name and/or subname",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 10,
+        "instructions_url": "https://www.notion.so/efdn/Register-an-ENS-name-and-or-subname-18fd989555418108a7eafd276b726268",
+        "description": "Claim your digital identity by registering an ENS name and share the transaction.",
+        "proofType": "link"
+      },
+      {
+        "id": 14,
+        "title": "💭 [Optional Feedback] Register an ENS name and/or subname",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Register-an-ENS-name-and-or-subname-18fd989555418108a7eafd276b726268",
+        "description": "Tell us about your experience with ENS registration!",
+        "proofType": "text"
+      },
+      {
+        "id": 15,
+        "title": "🔧 Submit a PR to ethereum.org documentation",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 15,
+        "instructions_url": "https://www.notion.so/efdn/Submit-a-PR-to-ethereum-org-documentation-18fd9895554181a680cfc513235e338c",
+        "description": "Contribute to Ethereum documentation and share your pull request link.",
+        "proofType": "link"
+      },
+      {
+        "id": 16,
+        "title": "💭 [Optional Feedback] Submit a PR to ethereum.org documentation",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Submit-a-PR-to-ethereum-org-documentation-18fd9895554181a680cfc513235e338c",
+        "description": "How was your experience contributing to ethereum.org? Tell us about it!",
+        "proofType": "text"
+      },
+      {
+        "id": 17,
+        "title": "🎨 Post content on Zora or Rodeo",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 15,
+        "instructions_url": "https://www.notion.so/efdn/Post-content-on-Zora-or-Rodeo-18fd9895554181ebaa8feb26e7dd8fca",
+        "description": "Create and share content on a decentralized media platform.",
+        "proofType": "image"
+      },
+      {
+        "id": 18,
+        "title": "💭 [Optional Feedback] Post content on Zora or Rodeo",
+        "playersRequired": 1,
+        "difficulty": "easy",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Post-content-on-Zora-or-Rodeo-18fd9895554181ebaa8feb26e7dd8fca",
+        "description": "What did you think about creating content on web3? Share your experience!",
+        "proofType": "text"
+      },
+      {
+        "id": 19,
+        "title": "💬 Use an onchain messaging protocol",
+        "playersRequired": 2,
+        "difficulty": "easy",
+        "points": 10,
+        "instructions_url": "https://www.notion.so/efdn/Use-an-onchain-messaging-protocol-18fd9895554181f08bdcceb973375058",
+        "description": "Connect with a peer using an onchain messaging protocol and share proof.",
+        "proofType": "image"
+      },
+      {
+        "id": 20,
+        "title": "💭 [Optional Feedback] Use an onchain messaging protocol",
+        "playersRequired": 2,
+        "difficulty": "easy",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Use-an-onchain-messaging-protocol-18fd9895554181f08bdcceb973375058",
+        "description": "How was your experience with decentralized messaging? Let us know!",
+        "proofType": "text"
+      }
+    ]
   }
 ]
