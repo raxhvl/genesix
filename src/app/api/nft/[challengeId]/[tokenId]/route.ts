@@ -24,7 +24,7 @@ export async function GET(request: Request, props: Props) {
       name: `Onchain Days: ${challenge.nftTitle} #${tokenId}`,
       description: challenge.nftDescription,
       external_url: challenge.homepage,
-      image: `https://genesix.rahxvl.com/nft/placeholder.jpg`,
+      image: `${process.env.APP_URL}/nft/placeholder.jpg`,
       attributes: [
         {
           trait_type: "Collection",
