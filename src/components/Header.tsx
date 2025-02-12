@@ -1,11 +1,13 @@
 "use client";
 
+import { SUBMISSION_DEADLINE } from "@/lib/config";
 import { isRootPage } from "@/lib/ui";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Blocks, ScrollText, Settings2 } from "lucide-react";
+import { Blocks, ScrollText } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useWeb3Context } from "@/lib/context/Web3Context";
+import { CountdownTimer } from "./CountdownTimer";
 
 export default function Header() {
   const { isReviewer } = useWeb3Context();
@@ -13,27 +15,32 @@ export default function Header() {
   if (isRootPage()) return null;
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <nav className="container flex h-14 items-center gap-6">
+      <nav className="container flex h-14 items-center">
         <Link
           href="/"
-          className="font-geist-sans font-bold text-2xl tracking-tight text-primary mx-6"
+          className="font-geist-sans font-bold text-xl md:text-2xl tracking-tight text-primary mr-4 md:mr-6"
         >
           🌌 Genesix
         </Link>
-        <Link href="/challenges">
-          <Button variant="ghost" className="flex items-center gap-2">
-            <Blocks className="h-4 w-4" />
-            Challenges
-          </Button>
-        </Link>
-        {isReviewer && (
-          <Link href="/review">
+        <div className="flex items-center gap-2 md:gap-6">
+          <Link href="/challenges">
             <Button variant="ghost" className="flex items-center gap-2">
-              <ScrollText className="h-4 w-4" />
-              Review
+              <Blocks className="h-4 w-4" />
+              <span className="hidden md:inline">Challenges</span>
             </Button>
           </Link>
-        )}
+          {isReviewer && (
+            <Link href="/review">
+              <Button variant="ghost" className="flex items-center gap-2">
+                <ScrollText className="h-4 w-4" />
+                <span className="hidden md:inline">Review</span>
+              </Button>
+            </Link>
+          )}
+        </div>
+        <div className="mx-auto">
+          <CountdownTimer deadline={SUBMISSION_DEADLINE} />
+        </div>
         <div className="ml-auto">
           <ConnectButton />
         </div>
