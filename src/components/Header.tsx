@@ -3,14 +3,14 @@
 import { SUBMISSION_DEADLINE } from "@/lib/config";
 import { isRootPage } from "@/lib/ui";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { Blocks, ScrollText } from "lucide-react";
+import { Blocks, ScrollText, Settings } from "lucide-react"; // Add Settings import
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useWeb3Context } from "@/lib/context/Web3Context";
 import { CountdownTimer } from "./CountdownTimer";
 
 export default function Header() {
-  const { isReviewer } = useWeb3Context();
+  const { isReviewer, isOwner } = useWeb3Context();
 
   if (isRootPage()) return null;
   return (
@@ -34,6 +34,14 @@ export default function Header() {
               <Button variant="ghost" className="flex items-center gap-2">
                 <ScrollText className="h-4 w-4" />
                 <span className="hidden md:inline">Review</span>
+              </Button>
+            </Link>
+          )}
+          {isOwner && (
+            <Link href="/settings">
+              <Button variant="ghost" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                <span className="hidden md:inline">Settings</span>
               </Button>
             </Link>
           )}

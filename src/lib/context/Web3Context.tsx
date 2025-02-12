@@ -24,6 +24,7 @@ interface Web3ContextType {
   isConnected: boolean;
   isReviewer: boolean;
   isBetaTester: boolean;
+  isOwner: boolean; // Add this line
 }
 
 const Web3Context = createContext<Web3ContextType | null>(null);
@@ -32,6 +33,16 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   const { address, chainId, isConnected } = useAccount();
   const router = useRouter();
   const [isReviewer, setIsReviewer] = useState(false);
+  const contractAddress = chainId ? getContractAddress(chainId) : undefined;
+
+  // Add owner check
+  const { data: ownerAddress } = useReadContract({
+    address: contractAddress,
+    abi,
+    functionName: "owner",
+  });
+
+  const isOwner = Boolean(address && ownerAddress && address === ownerAddress);
 
   // Query contract for reviewer status
   const { data: isContractReviewer } = useReadContract({
@@ -73,6 +84,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
         isConnected,
         isReviewer,
         isBetaTester,
+        isOwner,
       }}
     >
       {children}
