@@ -19,7 +19,7 @@ export const chainConfig = getDefaultConfig({
 
 export const contractAddresses = {
   mainnet: "0xYourMainnetContractAddress" as Address, // TODO: Update with your contract address
-  sepolia: "0xYourSepoliaContractAddress" as Address, // TODO: Update with your contract address
+  sepolia: "0x5E715f0b429EEAbbc30f6AB56b2067f35df2b071" as Address, // TODO: Update with your contract address
   anvil: "0x5FbDB2315678afecb367f032d93F642f64180aa3" as Address,
 };
 
