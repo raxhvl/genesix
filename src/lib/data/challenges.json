@@ -5,7 +5,9 @@
     "description": "Get started with Ethereum by setting up a wallet and making your first transaction!",
     "homepage": "https://efdn.notion.site/Using-Ethereum-Mainnet-18fd98955541805b806acaae49adadf4",
     "submissionType": "google_form",
-    "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdUS_fRaPNgLBDsmDb95bjtNpmnNrlA7s3P_jP3caN1phcArw/viewform"
+    "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSdUS_fRaPNgLBDsmDb95bjtNpmnNrlA7s3P_jP3caN1phcArw/viewform",
+    "nftTitle": "Genesis Pioneer",
+    "nftDescription": "This NFT represents the first steps into Ethereum, awarded to pioneers who successfully navigated the mainnet waters."
   },
   {
     "id": 2,
@@ -13,7 +15,9 @@
     "description": "Experience the speed and cost savings of Ethereum Layer 2 solutions!",
     "homepage": "https://efdn.notion.site/Using-L2s-18fd989555418013b217f4856f31d171",
     "submissionType": "google_form",
-    "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSebqN_pFQ-yqcH-ICI6XeBX__sfXJMY7UF6zqqWVT6bilef4g/viewform"
+    "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSebqN_pFQ-yqcH-ICI6XeBX__sfXJMY7UF6zqqWVT6bilef4g/viewform",
+    "nftTitle": "Speed Demon",
+    "nftDescription": "A recognition for mastering Layer 2 solutions and harnessing the lightning-fast potential of Ethereum scaling."
   },
   {
     "id": 3,
@@ -21,7 +25,9 @@
     "description": "Dive into blockchain gaming and explore the world of digital collectibles!",
     "homepage": "https://efdn.notion.site/Gaming-NFTs-18fd9895554180cd88b1d06404a5d669",
     "submissionType": "google_form",
-    "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeCaPXdyfMqVrbLdeMpmRBkZpgUbLDM41UBpFHN7AeJlXLXqw/viewform"
+    "formUrl": "https://docs.google.com/forms/d/e/1FAIpQLSeCaPXdyfMqVrbLdeMpmRBkZpgUbLDM41UBpFHN7AeJlXLXqw/viewform",
+    "nftTitle": "Digital Curator",
+    "nftDescription": "A badge celebrating the exploration of blockchain gaming and NFTs, marking achievement in the digital renaissance."
   },
   {
     "id": 4,
@@ -29,6 +35,8 @@
     "description": "Experience decentralized governance by participating in DAOs and creating your own!",
     "homepage": "https://www.notion.so/efdn/Gaming-NFTs-18fd9895554180cd88b1d06404a5d669",
     "submissionType": "onchain",
+    "nftTitle": "Governance Guardian",
+    "nftDescription": "A distinction earned through mastering the art of decentralized governance and contributing to the future of DAOs.",
     "tasks": [
       {
         "id": 1,

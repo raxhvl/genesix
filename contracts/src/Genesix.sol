@@ -192,7 +192,7 @@ contract Genesix is ERC721, Ownable {
     /// @notice Returns the base URI for computing token URIs
     /// @return The base URI string
     function _baseURI() internal pure override returns (string memory) {
-        return "https://genesix.raxhvl.com/api/token";
+        return "https://genesix.raxhvl.com/api/nft";
     }
 
     /// @notice Returns token URI by combining base URI with challenge ID and token ID

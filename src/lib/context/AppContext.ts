@@ -41,6 +41,8 @@ interface Challenge {
   submissionType?: "google_form" | "onchain";
   formUrl?: string;
   tasks?: Task[];
+  nftTitle: string;
+  nftDescription: string;
 }
 
 interface AppContextType {

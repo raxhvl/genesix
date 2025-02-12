@@ -21,14 +21,22 @@ export async function GET(request: Request, props: Props) {
     }
 
     const metadata = {
-      name: `Onchain Days #${tokenId} // ${challenge.title}`,
-      description: challenge.description,
+      name: `Onchain Days: ${challenge.nftTitle} #${tokenId}`,
+      description: challenge.nftDescription,
       external_url: challenge.homepage,
-      image: `https://genesix.rahxvl.com/nft/${challengeId}.jpg`,
+      image: `https://genesix.rahxvl.com/nft/placeholder.jpg`,
       attributes: [
+        {
+          trait_type: "Collection",
+          value: "Onchain Days",
+        },
         {
           trait_type: "Challenge",
           value: challenge.title,
+        },
+        {
+          trait_type: "Category",
+          value: challenge.nftTitle,
         },
       ],
     };

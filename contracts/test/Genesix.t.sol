@@ -196,7 +196,7 @@ contract GenesixTest is Test {
         assertEq(
             genesix.tokenURI(tokenId),
             string(abi.encodePacked(
-                "https://genesix.raxhvl.com/api/token",
+                "https://genesix.raxhvl.com/api/nft",
                 "/",
                 "1", // challengeId
                 "/",
