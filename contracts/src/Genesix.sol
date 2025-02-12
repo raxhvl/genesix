@@ -2,6 +2,7 @@
 pragma solidity ^0.8.27;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 /*****************************************
@@ -15,7 +16,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 /// @title Genesix - An NFT-based challenge completion tracking system
 /// @notice This contract manages challenge submissions and approvals for players
 /// @dev Extends ERC721 for NFT functionality and Ownable for access control
-contract Genesix is ERC721, Ownable {
+contract Genesix is ERC721, ERC721Enumerable, Ownable {
     /*###########################/*
     ||           State           ||
     /*###########################*/
@@ -23,8 +24,12 @@ contract Genesix is ERC721, Ownable {
     mapping(address => bool) public isApprover;
     uint256 public immutable deadline;
 
-    // Add mapping to track token metadata
-    mapping(uint256 tokenId => uint256 challengeId) private _tokenChallenge;
+    // Change mapping names and visibility
+    mapping(uint256 tokenId => uint256 challengeId) public tokenChallenge;
+    mapping(uint256 tokenId => string submissionId) public tokenSubmission;
+
+    // Add new mapping to track completed challenges
+    mapping(address player => mapping(uint256 challengeId => bool completed)) public completedChallenges;
 
     struct Submission {
         uint256 challengeId;
@@ -44,14 +49,14 @@ contract Genesix is ERC721, Ownable {
     /// @notice Emitted when a submission is approved
     /// @param playerAddress The address of the player who submitted
     /// @param challengeId The ID of the challenge
-    /// @param submissionId The unique ID of the submission
-    /// @param points The array of points awarded for each task
+    /// @param nickname The nickname of the player
+    /// @param totalPoints The total points awarded for the submission
     /// @param tokenId The ID of the NFT minted for this submission
     event SubmissionApproved(
         address indexed playerAddress,
         uint256 indexed challengeId,
-        string submissionId,
-        uint256[] points,
+        string nickname,
+        uint256 totalPoints,
         uint256 indexed tokenId
     );
 
@@ -60,10 +65,6 @@ contract Genesix is ERC721, Ownable {
     /*############################*/
     /// @notice Thrown when a caller doesn't have required permissions
     error Unauthorized();
-    /// @notice Thrown when attempting to access a submission with wrong challenge ID
-    /// @param expected The challenge ID that was expected
-    /// @param actual The challenge ID that was provided
-    error ChallengeMismatch(uint256 expected, uint256 actual);
     /// @notice Thrown when trying to add an address that is already an approver
     error AlreadyApprover(address account);
     /// @notice Thrown when trying to remove an address that is not an approver
@@ -72,6 +73,11 @@ contract Genesix is ERC721, Ownable {
     /// @param deadline The deadline that was missed
     /// @param currentTime The current block timestamp
     error DeadlineExceeded(uint256 deadline, uint256 currentTime);
+    // Add new error
+    /// @notice Thrown when a player tries to submit the same challenge twice
+    /// @param player The address of the player
+    /// @param challengeId The ID of the challenge
+    error ChallengeAlreadyCompleted(address player, uint256 challengeId);
 
     /*############################/*
     ||         Modifiers          ||
@@ -120,6 +126,11 @@ contract Genesix is ERC721, Ownable {
         string calldata nickname,
         uint256[] calldata points
     ) public onlyApprover beforeDeadline {
+        // Add check for duplicate submission
+        if (completedChallenges[playerAddress][challengeId]) {
+            revert ChallengeAlreadyCompleted(playerAddress, challengeId);
+        }
+
         Player storage profile = profiles[playerAddress];
 
         // Only set nickname if it hasn't been set before
@@ -133,33 +144,34 @@ contract Genesix is ERC721, Ownable {
         });
 
         uint256 tokenId = _nextTokenId++;
-        _tokenChallenge[tokenId] = challengeId; // Store challenge ID for the token
+        tokenChallenge[tokenId] = challengeId; // Store challenge ID for the token
+        tokenSubmission[tokenId] = submissionId;
+        completedChallenges[playerAddress][challengeId] = true; // Mark as completed
         _safeMint(playerAddress, tokenId);
+
+        // Calculate total points
+        uint256 totalPoints = 0;
+        for (uint256 i = 0; i < points.length; i++) {
+            totalPoints += points[i];
+        }
 
         emit SubmissionApproved(
             playerAddress,
             challengeId,
-            submissionId,
-            points,
+            profile.nickname,
+            totalPoints,
             tokenId
         );
     }
 
-    /// @notice Get points for a specific submission
-    /// @param playerAddress The address of the player
-    /// @param challengeId The ID of the challenge
-    /// @param submissionId The ID of the submission
+    /// @notice Get points for a specific token
+    /// @param tokenId The ID of the token
     /// @return points Array of points from the submission
-    function getPoints(
-        address playerAddress,
-        uint256 challengeId,
-        string calldata submissionId
-    ) public view returns (uint256[] memory) {
-        Submission memory submission = profiles[playerAddress].submissions[submissionId];
-        if (submission.challengeId != challengeId) {
-            revert ChallengeMismatch(submission.challengeId, challengeId);
-        }
-        return submission.points;
+    function getPoints(uint256 tokenId) public view returns (uint256[] memory) {
+        _requireOwned(tokenId);
+        address owner = ownerOf(tokenId);
+        string memory submissionId = tokenSubmission[tokenId];
+        return profiles[owner].submissions[submissionId].points;
     }
 
     /// @notice Get a player's nickname
@@ -200,7 +212,7 @@ contract Genesix is ERC721, Ownable {
     /// @return The token URI string
     function tokenURI(uint256 tokenId) public view override returns (string memory) {
         _requireOwned(tokenId);
-        uint256 challengeId = _tokenChallenge[tokenId];
+        uint256 challengeId = tokenChallenge[tokenId];
         return string(abi.encodePacked(
             _baseURI(),
             "/",
@@ -215,7 +227,22 @@ contract Genesix is ERC721, Ownable {
     /// @return The challenge ID
     function getChallengeId(uint256 tokenId) public view returns (uint256) {
         _requireOwned(tokenId);
-        return _tokenChallenge[tokenId];
+        return tokenChallenge[tokenId];
+    }
+
+    /// @notice Get the token ID for a player's completed challenge
+    /// @param player The address of the player
+    /// @param challengeId The ID of the challenge
+    /// @return tokenId The ID of the token, or revert if not found
+    function getTokenForChallenge(address player, uint256 challengeId) public view returns (uint256) {
+        uint256 balance = balanceOf(player);
+        for (uint256 i = 0; i < balance; i++) {
+            uint256 tokenId = tokenOfOwnerByIndex(player, i);
+            if (tokenChallenge[tokenId] == challengeId) {
+                return tokenId;
+            }
+        }
+        revert("Challenge not completed");
     }
 
     /// @notice Convert uint256 to string
@@ -238,5 +265,30 @@ contract Genesix is ERC721, Ownable {
             value /= 10;
         }
         return string(buffer);
+    }
+
+    // The following functions are overrides required by Solidity.
+    function _update(address to, uint256 tokenId, address auth)
+        internal
+        override(ERC721, ERC721Enumerable)
+        returns (address)
+    {
+        return super._update(to, tokenId, auth);
+    }
+
+    function _increaseBalance(address account, uint128 value)
+        internal
+        override(ERC721, ERC721Enumerable)
+    {
+        super._increaseBalance(account, value);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721Enumerable)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
     }
 }

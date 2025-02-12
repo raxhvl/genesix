@@ -33,7 +33,7 @@ export interface Task {
   required?: boolean;
 }
 
-interface Challenge {
+export interface Challenge {
   id: number;
   title: string;
   description: string;

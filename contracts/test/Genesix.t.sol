@@ -66,7 +66,7 @@ contract GenesixTest is Test {
 
         assertEq(genesix.balanceOf(player), 1);
         
-        uint256[] memory retrieved = genesix.getPoints(player, 1, "sub-1");
+        uint256[] memory retrieved = genesix.getPoints(0);
         assertEq(retrieved[0], 10);
         assertEq(retrieved[1], 20);
         assertEq(retrieved[2], 30);
@@ -83,15 +83,13 @@ contract GenesixTest is Test {
         values2[1] = 25;
         values2[2] = 35;
 
-        // First submission includes nickname
         _submitChallenge(1, "sub-1", _createPoints(values1), "player1");
-        // Second submission has empty nickname
-        _submitChallenge(1, "sub-2", _createPoints(values2), "");
+        _submitChallenge(2, "sub-2", _createPoints(values2), "");
 
         assertEq(genesix.balanceOf(player), 2);
         
-        uint256[] memory sub1 = genesix.getPoints(player, 1, "sub-1");
-        uint256[] memory sub2 = genesix.getPoints(player, 1, "sub-2");
+        uint256[] memory sub1 = genesix.getPoints(0);
+        uint256[] memory sub2 = genesix.getPoints(1);
         
         assertEq(sub1[0], 10);
         assertEq(sub2[0], 15);
@@ -103,13 +101,6 @@ contract GenesixTest is Test {
         genesix.approveSubmission(1, "sub-1", player, "player1", new uint256[](3));
     }
 
-    function test_RevertChallengeIdMismatch() public {
-        _submitChallenge(1, "sub-1", new uint256[](3), "player1");
-        
-        vm.expectRevert(abi.encodeWithSelector(Genesix.ChallengeMismatch.selector, 1, 2));
-        genesix.getPoints(player, 2, "sub-1");
-    }
-
     function test_IgnoreUpdatingNickname() public {
         uint256[] memory points = new uint256[](3);
         
@@ -119,7 +110,7 @@ contract GenesixTest is Test {
 
         // Second submission with different nickname should be accepted but nickname ignored
         vm.prank(approver);
-        genesix.approveSubmission(1, "sub-2", player, "different-nickname", points);
+        genesix.approveSubmission(2, "sub-2", player, "different-nickname", points);
 
         // Both submissions should succeed
         assertEq(genesix.balanceOf(player), 2);
@@ -219,5 +210,97 @@ contract GenesixTest is Test {
             keccak256(bytes(genesix.tokenURI(0))) != 
             keccak256(bytes(genesix.tokenURI(1)))
         );
+    }
+
+    function test_GetTokenForChallenge() public {
+        // Submit two different challenges for the same player
+        uint256[] memory points = new uint256[](3);
+        points[0] = 10;
+        points[1] = 20;
+        points[2] = 30;
+
+        _submitChallenge(1, "sub-1", points, "player1"); // tokenId 0
+        _submitChallenge(2, "sub-2", points, "");        // tokenId 1
+
+        // Check if we can get the correct token IDs
+        assertEq(genesix.getTokenForChallenge(player, 1), 0);
+        assertEq(genesix.getTokenForChallenge(player, 2), 1);
+    }
+
+    function test_GetTokenForChallengeReverts() public {
+        // Try to get token for non-existent challenge
+        vm.expectRevert("Challenge not completed");
+        genesix.getTokenForChallenge(player, 999);
+
+        // Submit a challenge
+        uint256[] memory points = new uint256[](3);
+        _submitChallenge(1, "sub-1", points, "player1");
+
+        // Try to get token for different challenge
+        vm.expectRevert("Challenge not completed");
+        genesix.getTokenForChallenge(player, 2);
+
+        // Try to get token for non-existent player
+        address nonPlayer = makeAddr("nonPlayer");
+        vm.expectRevert("Challenge not completed");
+        genesix.getTokenForChallenge(nonPlayer, 1);
+    }
+
+    function test_SubmissionApprovedEvent() public {
+        uint256[] memory points = new uint256[](3);
+        points[0] = 10;
+        points[1] = 20;
+        points[2] = 30;
+        uint256 challengeId1 = 1;
+        uint256 challengeId2 = 2;
+        string memory nickname = "player1";
+        uint256 expectedTotalPoints = 60; // 10 + 20 + 30
+        uint256 expectedTokenId = 0; // First token
+
+        // Expect the event with correct parameters
+        vm.expectEmit(true, true, true, true);
+        emit Genesix.SubmissionApproved(
+            player,
+            challengeId1,
+            nickname,
+            expectedTotalPoints,
+            expectedTokenId
+        );
+
+        _submitChallenge(challengeId1, "sub-1", points, nickname);
+
+        // Test subsequent submission keeps same nickname
+        uint256 secondTokenId = 1;
+        vm.expectEmit(true, true, true, true);
+        emit Genesix.SubmissionApproved(
+            player,
+            challengeId2,
+            nickname, // Should keep original nickname
+            expectedTotalPoints,
+            secondTokenId
+        );
+
+        _submitChallenge(challengeId2, "sub-2", points, "different-nickname");
+    }
+
+    function test_PreventDuplicateChallengeSubmission() public {
+        uint256[] memory points = new uint256[](3);
+        points[0] = 10;
+        points[1] = 20;
+        points[2] = 30;
+
+        // First submission should succeed
+        _submitChallenge(1, "sub-1", points, "player1");
+        
+        // Second submission of same challenge should fail
+        vm.expectRevert(abi.encodeWithSelector(
+            Genesix.ChallengeAlreadyCompleted.selector,
+            player,
+            1
+        ));
+        _submitChallenge(1, "sub-2", points, "player1");
+
+        // Different challenge ID should still work
+        _submitChallenge(2, "sub-3", points, "player1");
     }
 }
