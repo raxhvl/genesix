@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProofType, useAppContext } from "@/lib/context/AppContext";
 import type { Submission, Approval } from "@/lib/context/AppContext";
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useWeb3Context } from "@/lib/context/Web3Context";
 import { fetchSubmission } from "@/lib/fs";
 import { useWriteContract } from "wagmi";
@@ -23,6 +23,13 @@ import {
 import { Address } from "viem";
 import { Label } from "@/components/ui/label";
 import { Info } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Page() {
   const { challenges } = useAppContext();
@@ -33,6 +40,18 @@ export default function Page() {
   const [approvedTaskIds, setApprovedTaskIds] = useState<number[]>([]);
   const { toast } = useToast();
   const [showApprovalDialog, setShowApprovalDialog] = useState(false);
+  const [showDirectAwardDialog, setShowDirectAwardDialog] = useState(false);
+  const [directValue, setDirectValue] = useState<{
+    address: string;
+    nickname: string;
+    challengeId: number;
+    points: number;
+  }>({
+    address: "",
+    nickname: "",
+    challengeId: 1,
+    points: 0,
+  });
 
   const {
     writeContract,
@@ -91,24 +110,65 @@ export default function Page() {
     });
   }
 
-  function handleFinalApproval() {
-    if (!submission || !challenge) return;
-
+  // Consolidate both approval functions into one
+  function handleApproveSubmission(params: {
+    challengeId: number;
+    submissionId: string;
+    address: Address;
+    nickname: string;
+    points: number[];
+  }) {
     writeContract({
       address: getContractAddress(chainId),
       abi,
       functionName: "approveSubmission",
       args: [
-        submission.challengeId,
-        submissionId,
-        submission.playerAddress,
-        submission.nickname,
-        challenge?.tasks?.map((task) =>
-          approvedTaskIds.includes(task.id) ? BigInt(task.points) : BigInt(0)
-        ),
+        params.challengeId,
+        params.submissionId,
+        params.address,
+        params.nickname,
+        params.points.map((p) => BigInt(p)),
       ],
     });
+  }
+
+  function handleFinalApproval() {
+    if (!submission || !challenge) return;
+
+    handleApproveSubmission({
+      challengeId: submission.challengeId,
+      submissionId,
+      address: submission.playerAddress,
+      nickname: submission.nickname,
+      points:
+        challenge.tasks?.map((task) =>
+          approvedTaskIds.includes(task.id) ? task.points : 0
+        ) || [],
+    });
     setShowApprovalDialog(false);
+  }
+
+  function handleDirectAward(e: FormEvent) {
+    e.preventDefault();
+    if (!directValue.address || !directValue.nickname || !directValue.points)
+      return;
+
+    const points = [directValue.points];
+
+    handleApproveSubmission({
+      challengeId: directValue.challengeId,
+      submissionId: "direct",
+      address: directValue.address as Address,
+      nickname: directValue.nickname,
+      points,
+    });
+    setShowDirectAwardDialog(false);
+    setDirectValue({
+      address: "",
+      nickname: "",
+      challengeId: 1,
+      points: 0,
+    });
   }
 
   // Watch for transaction status
@@ -116,12 +176,19 @@ export default function Page() {
     if (isSuccess) {
       toast({
         title: "Success!",
-        description: "Submission has been approved successfully.",
+        description: "Points awarded successfully.",
       });
-      // Clear submission data after successful approval
+      // Clear all submission and direct award data after successful transaction
       setSubmission(null);
       setSubmissionId("");
       setApprovedTaskIds([]);
+      setDirectValue({
+        address: "",
+        nickname: "",
+        challengeId: 1,
+        points: 0,
+      });
+      setShowDirectAwardDialog(false);
     } else if (isError && contractError) {
       toast({
         variant: "destructive",
@@ -158,10 +225,15 @@ export default function Page() {
     }
   }
 
+  // Add this helper to filter Google Form challenges
+  const formBasedChallenges = challenges.filter(
+    (c) => c.submissionType === "google_form"
+  );
+
   return (
     <div className="container max-w-3xl mx-auto p-4 space-y-4">
-      <div>
-        <div className="flex gap-2">
+      <div className="flex gap-2 justify-between">
+        <div className="flex gap-2 flex-1">
           <Input
             value={submissionId}
             onChange={(e) => setSubmissionId(e.target.value)}
@@ -175,6 +247,12 @@ export default function Page() {
             {loading ? "Loading..." : "Load Submission"}
           </Button>
         </div>
+        <Button
+          variant="outline"
+          onClick={() => setShowDirectAwardDialog(true)}
+        >
+          Award Direct Points
+        </Button>
       </div>
 
       {submission && challenge && (
@@ -332,6 +410,120 @@ export default function Page() {
               {isPending ? "Confirming..." : "Confirm Approval"}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Direct Award Dialog */}
+      <Dialog
+        open={showDirectAwardDialog}
+        onOpenChange={setShowDirectAwardDialog}
+      >
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Award Points Directly</DialogTitle>
+            <DialogDescription>
+              Award points to a player without requiring a submission.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleDirectAward} className="space-y-6">
+            <div className="grid gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="direct-address">Wallet Address</Label>
+                <Input
+                  id="direct-address"
+                  placeholder="0x..."
+                  value={directValue.address}
+                  onChange={(e) =>
+                    setDirectValue((prev) => ({
+                      ...prev,
+                      address: e.target.value,
+                    }))
+                  }
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="direct-nickname">Nickname</Label>
+                <Input
+                  id="direct-nickname"
+                  placeholder="Enter nickname"
+                  value={directValue.nickname}
+                  onChange={(e) =>
+                    setDirectValue((prev) => ({
+                      ...prev,
+                      nickname: e.target.value,
+                    }))
+                  }
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="challenge-select">Challenge</Label>
+                <Select
+                  value={directValue.challengeId.toString()}
+                  onValueChange={(value) =>
+                    setDirectValue((prev) => ({
+                      ...prev,
+                      challengeId: Number(value),
+                    }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a challenge" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {formBasedChallenges.map((c) => (
+                      <SelectItem key={c.id} value={c.id.toString()}>
+                        {c.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="points">Points</Label>
+                <Input
+                  id="points"
+                  type="number"
+                  min="0"
+                  placeholder="Enter points"
+                  value={directValue.points || ""}
+                  onChange={(e) =>
+                    setDirectValue((prev) => ({
+                      ...prev,
+                      points: Number(e.target.value),
+                    }))
+                  }
+                  required
+                />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowDirectAwardDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={
+                  isPending ||
+                  !directValue.address ||
+                  !directValue.nickname ||
+                  !directValue.points
+                }
+              >
+                {isPending ? "Awarding..." : "Award Points"}
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
