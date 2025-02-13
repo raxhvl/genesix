@@ -445,9 +445,9 @@
         "title": "⚙️ Use Remix to deploy & interact with a smart contract",
         "playersRequired": 1,
         "difficulty": "medium",
-        "points": 0,
+        "points": 30,
         "instructions_url": "https://www.notion.so/efdn/Use-Remix-to-deploy-interact-with-a-smart-contract-18fd9895554181db8de4e2768422a40f",
-        "description": "TBD",
+        "description": "Paste Etherscan URL of the token transfer transaction as proof of completion.",
         "proofType": "text"
       },
       {
