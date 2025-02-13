@@ -21,7 +21,7 @@ export async function GET(request: Request, props: Props) {
     }
 
     const metadata = {
-      name: `Onchain Days: ${challenge.nftTitle} #${tokenId}`,
+      name: `EF Onchain Days: ${challenge.nftTitle} #${tokenId}`,
       description: challenge.nftDescription,
       external_url: challenge.homepage,
       image: `${process.env.APP_URL}/nft/placeholder.jpg`,

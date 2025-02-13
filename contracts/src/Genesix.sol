@@ -101,7 +101,7 @@ contract Genesix is ERC721, ERC721Enumerable, Ownable {
     /// @param initialOwner The address that will own the contract
     constructor(
         address initialOwner
-    ) ERC721("Onchain Days", "OCD") Ownable(initialOwner) {
+    ) ERC721("EF Onchain Days", "OCD") Ownable(initialOwner) {
         deadline = 1739491200;
     }
 
