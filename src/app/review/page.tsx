@@ -8,13 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ProofType, useAppContext } from "@/lib/context/AppContext";
-import type { Submission, Approval } from "@/lib/context/AppContext";
+import type { Submission } from "@/lib/context/AppContext";
 import { useState, useEffect, FormEvent } from "react";
 import { useWeb3Context } from "@/lib/context/Web3Context";
 import { fetchSubmission } from "@/lib/fs";
-import { useWriteContract } from "wagmi";
+import { useConfig } from "wagmi";
 import { abi, getContractAddress } from "@/lib/config";
 import { useToast } from "@/hooks/use-toast";
+import { writeContract, simulateContract } from "@wagmi/core";
 import {
   Dialog,
   DialogContent,
@@ -23,7 +24,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Address } from "viem";
+import { Address, WriteContractErrorType } from "viem";
 import { Label } from "@/components/ui/label";
 import { Info } from "lucide-react";
 import {
@@ -35,6 +36,7 @@ import {
 } from "@/components/ui/select";
 
 export default function Page() {
+  const config = useConfig();
   const { challenges } = useAppContext();
   const { chainId } = useWeb3Context();
   const [submissionId, setSubmissionId] = useState("");
@@ -55,14 +57,6 @@ export default function Page() {
     challengeId: 1,
     points: 0,
   });
-
-  const {
-    writeContract,
-    isSuccess,
-    isPending,
-    isError,
-    error: contractError,
-  } = useWriteContract();
 
   // Find challenge and calculate points
   const challenge = submission
@@ -114,25 +108,82 @@ export default function Page() {
   }
 
   // Consolidate both approval functions into one
-  function handleApproveSubmission(params: {
+  async function handleApproveSubmission(params: {
     challengeId: number;
     submissionId: string;
     address: Address;
     nickname: string;
     points: number[];
   }) {
-    writeContract({
-      address: getContractAddress(chainId),
-      abi,
-      functionName: "approveSubmission",
-      args: [
-        params.challengeId,
-        params.submissionId,
-        params.address,
-        params.nickname,
-        params.points.map((p) => BigInt(p)),
-      ],
-    });
+    try {
+      const { request } = await simulateContract(config, {
+        address: getContractAddress(chainId),
+        abi,
+        functionName: "approveSubmission",
+        args: [
+          params.challengeId,
+          params.submissionId,
+          params.address,
+          params.nickname,
+          params.points.map((p) => BigInt(p)),
+        ],
+      });
+
+      await writeContract(config, request);
+
+      toast({
+        title: "Success!",
+        description: "Points awarded successfully.",
+      });
+      // Clear all submission and direct award data after successful transaction
+      setSubmission(null);
+      setSubmissionId("");
+      setApprovedTaskIds([]);
+      setDirectValue({
+        address: "",
+        nickname: "",
+        challengeId: 1,
+        points: 0,
+      });
+      setShowDirectAwardDialog(false);
+    } catch (e) {
+      const error = e as WriteContractErrorType;
+      // Handle contract-specific errors
+      if (error.message.includes("Unauthorized")) {
+        toast({
+          variant: "destructive",
+          title: "Unauthorized",
+          description: "You don't have approver permissions",
+        });
+      } else if (error.message.includes("NotApprover")) {
+        toast({
+          variant: "destructive",
+          title: "Not Approver",
+          description: "This address is not an approver",
+        });
+      } else if (error.message.includes("DeadlineExceeded")) {
+        toast({
+          variant: "destructive",
+          title: "Deadline Exceeded",
+          description:
+            "The submission deadline has passed and points can no longer be awarded",
+        });
+      } else if (error.message.includes("ChallengeAlreadyCompleted")) {
+        toast({
+          variant: "destructive",
+          title: "Challenge Already Completed",
+          description:
+            "This player has already been awarded for the challenge.",
+        });
+      } else {
+        // Handle other unexpected errors
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message || "An unknown error occurred",
+        });
+      }
+    }
   }
 
   function handleFinalApproval() {
@@ -173,33 +224,6 @@ export default function Page() {
       points: 0,
     });
   }
-
-  // Watch for transaction status
-  useEffect(() => {
-    if (isSuccess) {
-      toast({
-        title: "Success!",
-        description: "Points awarded successfully.",
-      });
-      // Clear all submission and direct award data after successful transaction
-      setSubmission(null);
-      setSubmissionId("");
-      setApprovedTaskIds([]);
-      setDirectValue({
-        address: "",
-        nickname: "",
-        challengeId: 1,
-        points: 0,
-      });
-      setShowDirectAwardDialog(false);
-    } else if (isError && contractError) {
-      toast({
-        variant: "destructive",
-        title: "Transaction failed",
-        description: contractError.message,
-      });
-    }
-  }, [isSuccess, isError, contractError, toast]);
 
   // Add this helper function at the top of the component
   const renderTextWithLinks = (text: string) => {
@@ -380,9 +404,9 @@ export default function Page() {
             <Button
               onClick={submitApproval}
               className="w-full"
-              disabled={isPending || !approvedTaskIds.length}
+              disabled={!approvedTaskIds.length}
             >
-              {isPending ? "Approving..." : "Approve"}
+              Approve
             </Button>
           </CardContent>
         </Card>
@@ -455,9 +479,7 @@ export default function Page() {
             >
               Cancel
             </Button>
-            <Button onClick={handleFinalApproval} disabled={isPending}>
-              {isPending ? "Confirming..." : "Confirm Approval"}
-            </Button>
+            <Button onClick={handleFinalApproval}>Confirm Approval</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -563,13 +585,12 @@ export default function Page() {
               <Button
                 type="submit"
                 disabled={
-                  isPending ||
                   !directValue.address ||
                   !directValue.nickname ||
                   !directValue.points
                 }
               >
-                {isPending ? "Awarding..." : "Award Points"}
+                Award Points
               </Button>
             </DialogFooter>
           </form>

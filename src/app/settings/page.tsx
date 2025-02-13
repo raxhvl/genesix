@@ -3,6 +3,7 @@
 import { useWeb3Context } from "@/lib/context/Web3Context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
 import {
   Card,
   CardContent,
@@ -11,20 +12,18 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useState } from "react";
-import { useWriteContract } from "wagmi";
+import { useConfig } from "wagmi";
+import { WriteContractErrorType } from "viem";
+import { writeContract, simulateContract } from "@wagmi/core";
 import { abi, getContractAddress } from "@/lib/config";
 
 export default function Page() {
   const { isOwner, chainId } = useWeb3Context();
+  const { toast } = useToast();
   const [newApprover, setNewApprover] = useState("");
   const [removeApprover, setRemoveApprover] = useState("");
   const contractAddress = getContractAddress(chainId);
-
-  const { writeContract: addApprover, isPending: isAdding } =
-    useWriteContract();
-  const { writeContract: removeApproverFn, isPending: isRemoving } =
-    useWriteContract();
-
+  const config = useConfig();
   if (!isOwner) {
     return (
       <div className="p-4">
@@ -36,26 +35,49 @@ export default function Page() {
     );
   }
 
-  const handleAdd = () => {
-    if (!newApprover) return;
-    addApprover({
-      address: contractAddress,
-      abi,
-      functionName: "addApprover",
-      args: [newApprover],
-    });
-    setNewApprover("");
-  };
+  const manageApprover = async (action: "addApprover" | "removeApprover") => {
+    try {
+      const { request } = await simulateContract(config, {
+        address: contractAddress,
+        abi,
+        functionName: action,
+        args: [action === "addApprover" ? newApprover : removeApprover],
+      });
 
-  const handleRemove = () => {
-    if (!removeApprover) return;
-    removeApproverFn({
-      address: contractAddress,
-      abi,
-      functionName: "removeApprover",
-      args: [removeApprover],
-    });
-    setRemoveApprover("");
+      await writeContract(config, request);
+
+      toast({
+        title: "Success",
+        description: "Approver updated",
+      });
+
+      if (action === "addApprover") {
+        setNewApprover("");
+      } else {
+        setRemoveApprover("");
+      }
+    } catch (e) {
+      const error = e as WriteContractErrorType;
+      if (error.message.includes("AlreadyApprover")) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Address is already an approver",
+        });
+      } else if (error.message.includes("NotApprover")) {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Address is not an approver",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: error.message,
+        });
+      }
+    }
   };
 
   return (
@@ -76,7 +98,10 @@ export default function Page() {
               value={newApprover}
               onChange={(e) => setNewApprover(e.target.value)}
             />
-            <Button onClick={handleAdd} disabled={isAdding || !newApprover}>
+            <Button
+              onClick={() => manageApprover("addApprover")}
+              disabled={!newApprover}
+            >
               Add
             </Button>
           </div>
@@ -98,8 +123,8 @@ export default function Page() {
               onChange={(e) => setRemoveApprover(e.target.value)}
             />
             <Button
-              onClick={handleRemove}
-              disabled={isRemoving || !removeApprover}
+              onClick={() => manageApprover("removeApprover")}
+              disabled={!removeApprover}
               variant="destructive"
             >
               Remove
