@@ -87,9 +87,11 @@ contract Genesix is ERC721, ERC721Enumerable, Ownable {
         _;
     }
 
-    /// @notice Check if contract deadline has passed
+    /// @notice Check if contract deadline has passed, with 3-day grace period
     modifier beforeDeadline() {
-        if (block.timestamp > deadline) {
+        // The deadline is for front-end users, to prevent submissions.
+        // However, approvers are granted a 3-day grace period to approve submissions.
+        if (block.timestamp > deadline + 3 days) {
             revert DeadlineExceeded(deadline, block.timestamp);
         }
         _;

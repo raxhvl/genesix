@@ -303,4 +303,26 @@ contract GenesixTest is Test {
         // Different challenge ID should still work
         _submitChallenge(2, "sub-3", points, "player1");
     }
+
+    function test_GracePeriodForApprovers() public {
+        uint256[] memory points = new uint256[](3);
+        
+        // Warp to after deadline but within grace period
+        vm.warp(deadline + 2 days);
+        
+        // Submission should work within grace period
+        _submitChallenge(1, "sub-1", points, "player1");
+        assertEq(genesix.balanceOf(player), 1);
+
+        // Warp to after grace period
+        vm.warp(deadline + 3 days + 1);
+
+        // Submission should fail after grace period
+        vm.expectRevert(abi.encodeWithSelector(
+            Genesix.DeadlineExceeded.selector,
+            deadline,
+            deadline + 3 days + 1
+        ));
+        _submitChallenge(2, "sub-2", points, "");
+    }
 }
