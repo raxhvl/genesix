@@ -14,6 +14,7 @@ import { ExternalLink, Info, Play, Trophy, Users } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
+import { ChallengeResultsDialog } from "./ChallengeResultsDialog";
 
 export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
   const { chainId, playerAddress } = useWeb3Context();
@@ -36,7 +37,8 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
 
   const isCompleted = tokenId !== undefined;
 
-  let pointsAwarded = 0n;
+  let pointsAwarded = 0;
+  let pointsArray: bigint[] = [];
   try {
     const { data } = useReadContract({
       address: contractAddress,
@@ -44,7 +46,8 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
       functionName: "getPoints",
       args: [tokenId],
     });
-    pointsAwarded = (data as bigint[]).reduce((acc, curr) => acc + curr, 0n);
+    pointsArray = data as bigint[];
+    pointsAwarded = pointsArray.reduce((acc, curr) => acc + Number(curr), 0);
   } catch (error) {}
 
   return (
@@ -84,23 +87,23 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
               </Badge>
             </div>
           </div>
-          {!isGoogleForm && (
-            <Badge
-              variant="secondary"
-              className={`flex items-center gap-1 ${
-                isCompleted
-                  ? "bg-green-500/20 text-green-400 border-green-500/30"
-                  : ""
-              }`}
-            >
-              <Trophy
-                className={`w-3 h-3 ${isCompleted ? "text-green-400" : ""}`}
-              />
-              {isCompleted
-                ? `${pointsAwarded} / ${totalPoints} pts`
-                : `${totalPoints} pts`}
-            </Badge>
-          )}
+          <Badge
+            variant="secondary"
+            className={`flex items-center gap-1 ${
+              isCompleted
+                ? "bg-green-500/20 text-green-400 border-green-500/30"
+                : ""
+            }`}
+          >
+            <Trophy
+              className={`w-3 h-3 ${isCompleted ? "text-green-400" : ""}`}
+            />
+            {isCompleted
+              ? isGoogleForm
+                ? `${pointsAwarded} pts`
+                : `${pointsAwarded} / ${totalPoints} pts`
+              : `${totalPoints} pts`}
+          </Badge>
         </div>
         <CardDescription className="line-clamp-2">
           {challenge.description}
@@ -159,22 +162,19 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
             )}
           </Button>
         ) : (
-          <Button
-            asChild
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium"
+          <ChallengeResultsDialog
+            challenge={challenge}
+            isGoogleForm={isGoogleForm}
+            pointsArray={pointsArray}
+            totalPointsAwarded={pointsAwarded}
+            totalPoints={totalPoints}
+            openseaUrl={getOpenseaUrl(chainId, contractAddress, tokenId!)}
           >
-            {tokenId !== undefined && (
-              <a
-                href={getOpenseaUrl(chainId, contractAddress, tokenId)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2"
-              >
-                View NFT ✨
-                <Trophy size={16} />
-              </a>
-            )}
-          </Button>
+            <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium">
+              View Results ✨
+              <Trophy size={16} className="ml-2" />
+            </Button>
+          </ChallengeResultsDialog>
         )}
       </CardFooter>
     </Card>

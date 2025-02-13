@@ -61,6 +61,10 @@ export const openseaConfig = {
   anvil: "https://testnets.opensea.io/assets/sepolia", // This URL Points to sepolia, its okay.
 } as const;
 
+export const audioConfig = {
+  celebrationSound: "/audio/celebration.mp3",
+} as const;
+
 export const getOpenseaUrl = (
   chainId: number,
   contractAddress: string,

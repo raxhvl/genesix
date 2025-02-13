@@ -72,6 +72,7 @@ forge test
 - The first prototype was built using [v0.dev](https://v0.dev/)
 - The landing page is a fork of [this page](https://v0.dev/chat/community/background-paths-s2R42ut7CxT) by knockout
 - The UI components are powered by [shadcn/ui](https://ui.shadcn.com/), an excellent collection of reusable components
+- Celebration Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=5995">freesound_community</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=5995">Pixabay</a>
 
 ## License
 
