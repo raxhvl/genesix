@@ -6,7 +6,7 @@ import {
   SubmissionPayloadVersion,
   useAppContext,
 } from "@/lib/context/AppContext";
-import { FormEvent, use, useState } from "react";
+import { FormEvent, use, useEffect, useState } from "react";
 import type { Submission } from "@/lib/context/AppContext";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +37,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { challenges } = useAppContext();
-  const { playerAddress, chainId, isBetaTester } = useWeb3Context();
+  const { playerAddress, chainId, isBetaTester, deadline } = useWeb3Context();
   const router = useRouter();
   const { toast } = useToast(); // Add this at the top with other hooks
 
@@ -75,6 +75,16 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [submissionId, setSubmissionId] = useState<string>("");
   const [showConfetti, setShowConfetti] = useState(false);
+  const [isExpired, setIsExpired] = useState(Date.now() / 1000 > deadline);
+
+  useEffect(() => {
+    const checkDeadline = () => {
+      setIsExpired(Date.now() / 1000 > deadline);
+    };
+
+    const timer = setInterval(checkDeadline, 1000);
+    return () => clearInterval(timer);
+  }, [deadline]);
 
   if (!challenge) {
     return <div>Challenge not found!</div>;
@@ -113,6 +123,14 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
     event: FormEvent<HTMLFormElement>
   ): Promise<void> {
     event.preventDefault();
+    if (isExpired) {
+      toast({
+        title: "Challenge Expired",
+        description: "This challenge is no longer accepting submissions.",
+        variant: "destructive",
+      });
+      return;
+    }
     setShowConfirmDialog(true);
   }
 
@@ -310,7 +328,12 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
             ))}
           </div>
 
-          <Button type="submit" size="lg" className="w-full md:w-auto">
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full md:w-auto"
+            disabled={isExpired}
+          >
             Review Submission
           </Button>
         </form>

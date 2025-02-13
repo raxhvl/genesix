@@ -11,12 +11,7 @@ import { useAccount, useReadContract } from "wagmi";
 import { useRouter } from "next/navigation";
 import { Address } from "viem";
 import Home from "@/app/page";
-import {
-  reviewerAddresses,
-  betaTesters,
-  abi,
-  getContractAddress,
-} from "@/lib/config";
+import { betaTesters, abi, getContractAddress } from "@/lib/config";
 
 interface Web3ContextType {
   chainId: number;
@@ -63,10 +58,7 @@ export function Web3Provider({ children }: { children: ReactNode }) {
   // Check both static list and contract for reviewer status
   useEffect(() => {
     if (address) {
-      setIsReviewer(
-        // TODO: Remove static reviewers
-        reviewerAddresses.includes(address) || !!isContractReviewer
-      );
+      setIsReviewer(!!isContractReviewer);
     } else {
       setIsReviewer(false);
     }

@@ -19,7 +19,7 @@ export const chainConfig = getDefaultConfig({
 
 export const contractAddresses = {
   mainnet: "0xYourMainnetContractAddress" as Address, // TODO: Update with your contract address
-  sepolia: "0x5E715f0b429EEAbbc30f6AB56b2067f35df2b071" as Address, // TODO: Update with your contract address
+  sepolia: "0x5E715f0b429EEAbbc30f6AB56b2067f35df2b071" as Address,
   anvil: "0x5FbDB2315678afecb367f032d93F642f64180aa3" as Address,
 };
 
@@ -43,12 +43,6 @@ export const imageConfig = {
   maxSizeInMB: 3,
   acceptedTypes: ["image/jpeg", "image/png", "image/gif", "image/webp"],
 };
-
-// TODO: Remove static reviewers
-export const reviewerAddresses: Address[] = [
-  "0x5a9d681201fedb563B29D3099628c2c6fA1BBDD8",
-  "0xbb3EAa87E8057f84fD47C16D59dFBD20Ab9B5b2f",
-];
 
 export const betaTesters: Address[] = [
   "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266", // Allows submissions on testnets

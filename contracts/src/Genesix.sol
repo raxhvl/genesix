@@ -112,8 +112,6 @@ contract Genesix is ERC721, ERC721Enumerable, Ownable {
     /*############################*/
     
 
-    //TODO:  rename answers to points
-    //TODO: add challenge to players array.
     /// @notice Approve a player's challenge submission and mint an NFT
     /// @param challengeId The ID of the challenge being submitted
     /// @param submissionId The ID of the submission

@@ -15,9 +15,21 @@ import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import Link from "next/link";
 import { ChallengeResultsDialog } from "./ChallengeResultsDialog";
+import { useEffect, useState } from "react";
 
 export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
-  const { chainId, playerAddress } = useWeb3Context();
+  const { chainId, playerAddress, deadline } = useWeb3Context();
+  const [isExpired, setIsExpired] = useState(Date.now() / 1000 > deadline);
+
+  useEffect(() => {
+    const checkDeadline = () => {
+      setIsExpired(Date.now() / 1000 > deadline);
+    };
+
+    const timer = setInterval(checkDeadline, 1000);
+    return () => clearInterval(timer);
+  }, [deadline]);
+
   const contractAddress = getContractAddress(chainId);
   const isGoogleForm = challenge.submissionType === "google_form";
   const totalPoints =
@@ -54,7 +66,7 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
     <Card
       className={`flex flex-col hover:shadow-lg transition-shadow relative overflow-hidden ${
         isCompleted ? "border-green-600/50" : ""
-      }`}
+      } ${isExpired && !isCompleted ? "opacity-75" : ""}`}
     >
       {isCompleted && (
         <div className="absolute -left-12 top-5 -rotate-45 bg-gradient-to-r from-green-600 to-green-500 text-white px-12 py-1 text-sm font-medium shadow-lg">
@@ -134,7 +146,27 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
       </CardContent>
 
       <CardFooter>
-        {!isCompleted ? (
+        {isCompleted ? (
+          <ChallengeResultsDialog
+            challenge={challenge}
+            isGoogleForm={isGoogleForm}
+            pointsArray={pointsArray}
+            totalPointsAwarded={pointsAwarded}
+            totalPoints={totalPoints}
+            openseaUrl={getOpenseaUrl(chainId, contractAddress, tokenId!)}
+          >
+            <Button className="w-full golden-btn font-bold">
+              <div className="flex items-center justify-center gap-2">
+                View Result
+                <Trophy size={20} className="stroke-[4]" />
+              </div>
+            </Button>
+          </ChallengeResultsDialog>
+        ) : isExpired ? (
+          <Button disabled className="w-full" variant="destructive">
+            Challenge Expired
+          </Button>
+        ) : (
           <Button
             asChild
             className={`w-full ${
@@ -161,22 +193,6 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
               </Link>
             )}
           </Button>
-        ) : (
-          <ChallengeResultsDialog
-            challenge={challenge}
-            isGoogleForm={isGoogleForm}
-            pointsArray={pointsArray}
-            totalPointsAwarded={pointsAwarded}
-            totalPoints={totalPoints}
-            openseaUrl={getOpenseaUrl(chainId, contractAddress, tokenId!)}
-          >
-            <Button className="w-full golden-btn font-bold">
-              <div className="flex items-center justify-center gap-2">
-                View Result
-                <Trophy size={20} className="stroke-[4]" />
-              </div>
-            </Button>
-          </ChallengeResultsDialog>
         )}
       </CardFooter>
     </Card>
