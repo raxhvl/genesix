@@ -170,9 +170,11 @@ export default function ChallengeCard({ challenge }: { challenge: Challenge }) {
             totalPoints={totalPoints}
             openseaUrl={getOpenseaUrl(chainId, contractAddress, tokenId!)}
           >
-            <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium">
-              View Results ✨
-              <Trophy size={16} className="ml-2" />
+            <Button className="w-full golden-btn font-bold">
+              <div className="flex items-center justify-center gap-2">
+                View Result
+                <Trophy size={20} className="stroke-[4]" />
+              </div>
             </Button>
           </ChallengeResultsDialog>
         )}
