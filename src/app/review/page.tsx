@@ -1,5 +1,8 @@
 "use client";
 
+// Add these imports at the top with other imports
+import { Search, Award } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -232,28 +235,74 @@ export default function Page() {
 
   return (
     <div className="container max-w-3xl mx-auto p-4 space-y-4">
-      <div className="flex gap-2 justify-between">
-        <div className="flex gap-2 flex-1">
-          <Input
-            value={submissionId}
-            onChange={(e) => setSubmissionId(e.target.value)}
-            onKeyUp={handleSubmissionSearch}
-            placeholder="Enter submission ID"
-          />
-          <Button
-            onClick={() => fetchSubmissionData(submissionId)}
-            disabled={loading || !submissionId}
-          >
-            {loading ? "Loading..." : "Load Submission"}
-          </Button>
-        </div>
-        <Button
-          variant="outline"
-          onClick={() => setShowDirectAwardDialog(true)}
-        >
-          Award Direct Points
-        </Button>
-      </div>
+      <h1 className="text-2xl font-bold mb-4">Review Submission</h1>
+      <Card>
+        <CardHeader>
+          <CardTitle>Load Submission or Award Points</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-[1fr,auto,1fr] gap-6 items-center">
+            {/* Left side - Load Submission */}
+            <div className="space-y-4">
+              <h3 className="font-medium text-sm text-muted-foreground">
+                LOAD SUBMISSION
+              </h3>
+              <div className="flex gap-2">
+                <div className="flex-1">
+                  <Input
+                    value={submissionId}
+                    onChange={(e) => setSubmissionId(e.target.value)}
+                    onKeyUp={handleSubmissionSearch}
+                    placeholder="Enter submission ID"
+                    className="h-9"
+                  />
+                </div>
+                <Button
+                  onClick={() => fetchSubmissionData(submissionId)}
+                  disabled={loading || !submissionId}
+                  size="sm"
+                  className="whitespace-nowrap bg-emerald-600 hover:bg-emerald-700"
+                >
+                  {loading ? (
+                    <>
+                      <span className="animate-spin mr-2">⏳</span>
+                      Loading...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="h-4 w-4 mr-2" />
+                      Load
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Center separator */}
+            <div className="hidden md:flex flex-col items-center gap-2">
+              <div className="w-px h-full bg-border border-r border-dotted"></div>
+              <span className="bg-card px-3 py-1 text-sm font-medium text-muted-foreground">
+                OR
+              </span>
+              <div className="w-px h-full bg-border border-r border-dotted"></div>
+            </div>
+
+            {/* Right side - Direct Award */}
+            <div className="space-y-4">
+              <h3 className="font-medium text-sm text-muted-foreground">
+                DIRECT AWARD
+              </h3>
+              <Button
+                onClick={() => setShowDirectAwardDialog(true)}
+                className="w-full h-9 bg-emerald-600 hover:bg-emerald-700"
+              >
+                <Award className="h-4 w-4 mr-2" />
+                Award Points Directly
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {submission && challenge && (
         <Card>
