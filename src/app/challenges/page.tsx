@@ -45,8 +45,8 @@ export default function Page() {
               className="flex flex-col hover:shadow-lg transition-shadow"
             >
               <CardHeader>
-                <div className="flex justify-between items-start space-x-4">
-                  <div>
+                <div className="flex justify-between items-start space-x-4 flex-wrap">
+                  <div className="flex-grow min-w-0">
                     <CardTitle className="text-xl mb-2">
                       {challenge.title}
                     </CardTitle>
@@ -77,7 +77,7 @@ export default function Page() {
                   {!isGoogleForm && (
                     <Badge
                       variant="secondary"
-                      className="flex items-center gap-1"
+                      className="flex items-center gap-1 flex-shrink-0"
                     >
                       <Trophy className="w-3 h-3" />
                       {totalPoints} pts

@@ -412,5 +412,134 @@
         "proofType": "text"
       }
     ]
+  },
+  {
+    "id": 6,
+    "title": " 🛠️ Day 6: Building on Ethereum",
+    "description": "Level up your Ethereum skills by completing a series of technical challenges!",
+    "homepage": "https://www.notion.so/efdn/Building-on-Ethereum-18fd9895554180c8be13c4006b224dde",
+    "submissionType": "onchain",
+    "tasks": [
+      {
+        "id": 1,
+        "title": "🏃 Complete a SpeedrunEth Quest",
+        "playersRequired": 1,
+        "difficulty": "medium",
+        "points": 30,
+        "instructions_url": "https://www.notion.so/efdn/Complete-a-SpeedrunEth-Quest-18fd989555418175bf6dfd7d88a64fc5",
+        "description": "Share the relevant Etherescan transaction links for the quests you completed.",
+        "proofType": "text"
+      },
+      {
+        "id": 2,
+        "title": "💭 [Optional Feedback] Complete a SpeedrunEth Quest",
+        "playersRequired": 1,
+        "difficulty": "medium",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Complete-a-SpeedrunEth-Quest-18fd989555418175bf6dfd7d88a64fc5",
+        "description": "What was your experience with SpeedrunEth? Share your thoughts!",
+        "proofType": "text"
+      },
+      {
+        "id": 3,
+        "title": "⚙️ Use Remix to deploy & interact with a smart contract",
+        "playersRequired": 1,
+        "difficulty": "medium",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Use-Remix-to-deploy-interact-with-a-smart-contract-18fd9895554181db8de4e2768422a40f",
+        "description": "TBD",
+        "proofType": "text"
+      },
+      {
+        "id": 4,
+        "title": "💭 [Optional Feedback] Use Remix to deploy & interact with a smart contract",
+        "playersRequired": 1,
+        "difficulty": "medium",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Use-Remix-to-deploy-interact-with-a-smart-contract-18fd9895554181db8de4e2768422a40f",
+        "description": "Share your thoughts on using Remix for smart contract deployment!",
+        "proofType": "text"
+      },
+      {
+        "id": 5,
+        "title": "🧪 Use EEST (Execution-Spec-Tests)",
+        "playersRequired": 1,
+        "difficulty": "medium",
+        "points": 30,
+        "instructions_url": "https://www.notion.so/efdn/Use-EEST-Execution-Spec-Tests-18fd989555418130b8ddd5fa2afe5a0d",
+        "description": "Screenshot the content of the .json file and upload the photo here",
+        "proofType": "image"
+      },
+      {
+        "id": 6,
+        "title": "💭 [Optional Feedback] Use EEST (Execution-Spec-Tests)",
+        "playersRequired": 1,
+        "difficulty": "medium",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Use-EEST-Execution-Spec-Tests-18fd989555418130b8ddd5fa2afe5a0d",
+        "description": "Share your thoughts on using EEST for protocol testing!",
+        "proofType": "text"
+      },
+      {
+        "id": 7,
+        "title": "🌐 Run a devnet with kurtosis",
+        "playersRequired": 1,
+        "difficulty": "medium",
+        "points": 30,
+        "instructions_url": "https://www.notion.so/efdn/Run-a-devnet-with-kurtosis-18fd98955541811d95f8eeb4df912165",
+        "description": "Take a screenshot of the Dora page and upload it here",
+        "proofType": "image"
+      },
+      {
+        "id": 8,
+        "title": "💭 [Optional Feedback] Run a devnet with kurtosis",
+        "playersRequired": 1,
+        "difficulty": "medium",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Run-a-devnet-with-kurtosis-18fd98955541811d95f8eeb4df912165",
+        "description": "How was your experience running a devnet with Kurtosis? Share your thoughts!",
+        "proofType": "text"
+      },
+      {
+        "id": 9,
+        "title": "🖥️ Setup a node",
+        "playersRequired": 1,
+        "difficulty": "hard",
+        "points": 35,
+        "instructions_url": "https://www.notion.so/efdn/Setup-a-node-18fd9895554181e3bc30c8412491927b",
+        "description": "Take a screenshot of your syncing EL node and upload it here",
+        "proofType": "image"
+      },
+      {
+        "id": 10,
+        "title": "💭 [Optional Feedback] Setup a node",
+        "playersRequired": 1,
+        "difficulty": "hard",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Setup-a-node-18fd9895554181e3bc30c8412491927b",
+        "description": "Share your thoughts on setting up a node! ",
+        "proofType": "text"
+      },
+      {
+        "id": 11,
+        "title": "💎 Extract MEV on a testnet",
+        "playersRequired": 1,
+        "difficulty": "hard",
+        "points": 35,
+        "instructions_url": "https://www.notion.so/efdn/Extract-MEV-on-a-testnet-18fd989555418191a5cde7247869e6a7",
+        "description": "Share Etherscan links of the transactions you extracted MEV",
+        "proofType": "text"
+      },
+      {
+        "id": 12,
+        "title": "💭 [Optional Feedback] Extract MEV on a testnet",
+        "playersRequired": 1,
+        "difficulty": "hard",
+        "points": 0,
+        "instructions_url": "https://www.notion.so/efdn/Extract-MEV-on-a-testnet-18fd989555418191a5cde7247869e6a7",
+        "description": "Share your thoughts on extracting MEV on a testnet! ",
+        "proofType": "text"
+      }
+    ]
   }
 ]
